@@ -20,10 +20,10 @@ output would look something like this...
   <table>
     <tr>
       <td>
-        &nbsp;&nbsp;&nbsp;&nbsp;_ARMA virumque_ cano, _Troiae qui primus ab oris_<br />
-        _Italiam fato_ profugus Lavina_que venit_<br />
-        _litora - multum ille et terris_ jactatus _et_ alto<br />
-        _vi superum_, saevae memorem _Junonis_ ob _iram_,<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;<i>ARMA virumque</i> cano, <i>Troiae qui primus ab oris</i><br />
+        <i>Italiam fato</i> profugus Lavina<i>que venit</i><br />
+        <i>litora - multum ille et terris</i> jactatus <i>et</i> alto<br />
+        <i>vi superum</i>, saevae memorem <i>Junonis</i> ob <i>iram</i>,<br />
       </td>
     </tr>
   </table>
@@ -32,24 +32,24 @@ output would look something like this...
 
   <table style="border: 0px">
     <tr>
-      <td>**altum, i** _n._ the deep (sea) &dagger;</td>
-      <td>**memor, oris** mindful, remembering, un-</td>
+      <td><b>altum, i</b> _n._ the deep (sea) &dagger;</td>
+      <td><b>memor, oris</b> mindful, remembering, un-</td>
     </tr>
     <tr>
-      <td>**cano, ere, cecini, cantus** sing (of), chant,</td>
-      <td>&nbsp;&nbsp;forgetting&dagger;*</td>
+      <td><b>cano, ere, cecini, cantus</b> sing (of), chant,</td>
+      <td>&nbsp;&nbsp;forgetting&dagger;&#42;</td>
     </tr>
     <tr>
-      <td>&nbsp;&nbsp;procalim&dagger;*</td>
-      <td>**ob** on account of (_acc._)&dagger;</td>
+      <td>&nbsp;&nbsp;procalim&dagger;&#42;</td>
+      <td><b>ob</b> on account of (_acc._)&dagger;</td>
     </tr>
     <tr>
-      <td>**jacto** (1) toss, buffer&dagger;*</td>
-      <td>**profugus, a, um** exiled, fugutive&dagger;</td>
+      <td><b>jacto</b> (1) toss, buffer&dagger;&#42;</td>
+      <td><b>profugus, a, um</b> exiled, fugutive&dagger;</td>
     </tr>
     <tr>
-      <td>**Lavin(i)us, a, um** Lavinian, of Lavinium&dagger;</td>
-      <td>**saevus, a, um** cruel, stern, fierce&dagger;*</td>
+      <td><b>Lavin(i)us, a, um</b> Lavinian, of Lavinium&dagger;</td>
+      <td><b>saevus, a, um</b> cruel, stern, fierce&dagger;&#42;</td>
     </tr>
   </table>
 
