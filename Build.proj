@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) IxMilia.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
+<Project
+  xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+  DefaultTargets="Build"
+  ToolsVersion="12.0">
+
+  <PropertyGroup>
+    <Downloads>$(MSBuildThisFileDirectory)Downloads</Downloads>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <DirectoriesToClean Include="$(Downloads)" />
+  </ItemGroup>
+
+  <UsingTask TaskName="DownloadFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <Url ParameterType="System.String" Required="true" />
+      <Destination ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            if (!System.IO.File.Exists(Destination))
+            {
+                new System.Net.WebClient().DownloadFile(Url, Destination);
+            }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="CreateDirectories">
+    <MakeDir Directories="@(DirectoriesToClean)" />
+  </Target>
+
+  <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
+    <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
+                  Destination="$(Downloads)\aeneid1.xml" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="DownloadSources">
+    <!-- TODO -->
+  </Target>
+
+  <Target Name="Clean">
+    <RemoveDir Directories="@(DirectoriesToClean)" />
+  </Target>
+
+  <Target Name="Rebuild" DependsOnTargets="Clean;Build">
+  </Target>
+
+</Project>
