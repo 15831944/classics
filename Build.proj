@@ -7,29 +7,22 @@
 
   <PropertyGroup>
     <Downloads>$(MSBuildThisFileDirectory)Downloads</Downloads>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
   </PropertyGroup>
 
   <ItemGroup>
     <DirectoriesToClean Include="$(Downloads)" />
+    <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
   </ItemGroup>
 
-  <UsingTask TaskName="DownloadFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
-    <ParameterGroup>
-      <Url ParameterType="System.String" Required="true" />
-      <Destination ParameterType="System.String" Required="true" />
-    </ParameterGroup>
-    <Task>
-      <Reference Include="System" />
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
-            if (!System.IO.File.Exists(Destination))
-            {
-                new System.Net.WebClient().DownloadFile(Url, Destination);
-            }
-        ]]>
-      </Code>
-    </Task>
-  </UsingTask>
+  <Target Name="BuildTasks">
+    <MSBuild BuildInParallel="true"
+             Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+             Properties="TreatWarningsAsErrors=true"
+             Targets="Build" />
+  </Target>
+
+  <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
 
   <Target Name="CreateDirectories">
     <MakeDir Directories="@(DirectoriesToClean)" />
@@ -38,14 +31,20 @@
   <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
     <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
                   Destination="$(Downloads)\aeneid1.xml" />
+    <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
+                  Destination="$(Downloads)\dictpage.zip" />
   </Target>
 
-  <Target Name="Build" DependsOnTargets="DownloadSources">
+  <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
     <!-- TODO -->
   </Target>
 
   <Target Name="Clean">
     <RemoveDir Directories="@(DirectoriesToClean)" />
+    <MSBuild BuildInParallel="true"
+             Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+             Properties="TreatWarningsAsErrors=true"
+             Targets="Clean" />
   </Target>
 
   <Target Name="Rebuild" DependsOnTargets="Clean;Build">
