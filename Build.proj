@@ -5,53 +5,53 @@
   DefaultTargets="Build"
   ToolsVersion="12.0">
 
-  <PropertyGroup>
-    <Downloads>$(MSBuildThisFileDirectory)Downloads</Downloads>
-    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Downloads>$(MSBuildThisFileDirectory)Downloads</Downloads>
+        <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <DirectoriesToClean Include="$(Downloads)" />
-    <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
-  </ItemGroup>
+    <ItemGroup>
+        <DirectoriesToClean Include="$(Downloads)" />
+        <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
+    </ItemGroup>
 
-  <Target Name="BuildTasks">
-    <MSBuild BuildInParallel="true"
-             Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
-             Properties="TreatWarningsAsErrors=true"
-             Targets="Build" />
-  </Target>
+    <Target Name="BuildTasks">
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Build" />
+    </Target>
 
-  <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
-  <UsingTask TaskName="Unzip" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
+    <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
+    <UsingTask TaskName="Unzip" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
 
-  <Target Name="CreateDirectories">
-    <MakeDir Directories="@(DirectoriesToClean)" />
-  </Target>
+    <Target Name="CreateDirectories">
+        <MakeDir Directories="@(DirectoriesToClean)" />
+    </Target>
 
-  <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
-    <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
-                  Destination="$(Downloads)\aeneid1.xml" />
-    <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
-                  Destination="$(Downloads)\dictpage.zip" />
-    <Unzip Archive="$(Downloads)\dictpage.zip"
-           Destination="$(Downloads)"
-           OverwriteExisting="true" />
-  </Target>
+    <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
+                      Destination="$(Downloads)\aeneid1.xml" />
+        <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
+                      Destination="$(Downloads)\dictpage.zip" />
+        <Unzip Archive="$(Downloads)\dictpage.zip"
+               Destination="$(Downloads)"
+               OverwriteExisting="true" />
+    </Target>
 
-  <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
-    <!-- TODO -->
-  </Target>
+    <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
+        <!-- TODO -->
+    </Target>
 
-  <Target Name="Clean">
-    <RemoveDir Directories="@(DirectoriesToClean)" />
-    <MSBuild BuildInParallel="true"
-             Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
-             Properties="TreatWarningsAsErrors=true"
-             Targets="Clean" />
-  </Target>
+    <Target Name="Clean">
+        <RemoveDir Directories="@(DirectoriesToClean)" />
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Clean" />
+    </Target>
 
-  <Target Name="Rebuild" DependsOnTargets="Clean;Build">
-  </Target>
+    <Target Name="Rebuild" DependsOnTargets="Clean;Build">
+    </Target>
 
 </Project>
