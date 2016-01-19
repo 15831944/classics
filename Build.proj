@@ -6,12 +6,14 @@
   ToolsVersion="12.0">
 
     <PropertyGroup>
-        <Downloads>$(MSBuildThisFileDirectory)Downloads</Downloads>
+        <Downloads Condition="'$(Downloads)' == ''">$(MSBuildThisFileDirectory)Downloads</Downloads>
+        <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)Output</OutputPath>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     </PropertyGroup>
 
     <ItemGroup>
         <DirectoriesToClean Include="$(Downloads)" />
+        <DirectoriesToClean Include="$(OutputPath)" />
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
 
@@ -24,6 +26,7 @@
 
     <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
     <UsingTask TaskName="Unzip" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
+    <UsingTask TaskName="ProcessFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
 
     <Target Name="CreateDirectories">
         <MakeDir Directories="@(DirectoriesToClean)" />
@@ -40,7 +43,7 @@
     </Target>
 
     <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
-        <!-- TODO -->
+        <ProcessFile File="$(Downloads)\aeneid1.xml" Dictionary="$(Downloads)\DICTPAGE.RAW" Output="$(OutputPath)\Aeneid1.tex" />
     </Target>
 
     <Target Name="Clean">
