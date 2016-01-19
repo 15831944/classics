@@ -5,7 +5,7 @@ using System.Net;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace IxMilia.Classics2.Tasks
+namespace IxMilia.Classics.Tasks
 {
     public class DownloadFile : Task
     {

@@ -23,6 +23,7 @@
   </Target>
 
   <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
+  <UsingTask TaskName="Unzip" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
 
   <Target Name="CreateDirectories">
     <MakeDir Directories="@(DirectoriesToClean)" />
@@ -33,6 +34,9 @@
                   Destination="$(Downloads)\aeneid1.xml" />
     <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
                   Destination="$(Downloads)\dictpage.zip" />
+    <Unzip Archive="$(Downloads)\dictpage.zip"
+           Destination="$(Downloads)"
+           OverwriteExisting="true" />
   </Target>
 
   <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
