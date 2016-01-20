@@ -19,6 +19,7 @@ namespace IxMilia.Classics.Tasks
         {
             if (!File.Exists(Destination))
             {
+                Log.LogMessage($"Downloading from {Url}");
                 new WebClient().DownloadFile(Url, Destination);
             }
 

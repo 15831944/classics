@@ -8,6 +8,7 @@
     <PropertyGroup>
         <Downloads Condition="'$(Downloads)' == ''">$(MSBuildThisFileDirectory)Downloads</Downloads>
         <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)Output</OutputPath>
+        <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     </PropertyGroup>
 
@@ -38,12 +39,11 @@
         <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
                       Destination="$(Downloads)\dictpage.zip" />
         <Unzip Archive="$(Downloads)\dictpage.zip"
-               Destination="$(Downloads)"
-               OverwriteExisting="true" />
+               Destination="$(Downloads)" />
     </Target>
 
     <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
-        <ProcessFile File="$(Downloads)\aeneid1.xml" Dictionary="$(Downloads)\DICTPAGE.RAW" Output="$(OutputPath)\Aeneid1.tex" />
+        <ProcessFile File="$(Downloads)\aeneid1.xml" Dictionary="$(Downloads)\DICTPAGE.RAW" SuffixFile="$(SourceDir)\LatinSuffixes.txt" Output="$(OutputPath)\Aeneid1.tex" MaxLines="4" />
     </Target>
 
     <Target Name="Clean">

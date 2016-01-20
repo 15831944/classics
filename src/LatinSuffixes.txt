@@ -1,0 +1,49 @@
+# Entries in this file provide alternate suffixes for Latin words.  Lines
+# beginning with a hash '#' character and blank lines are ignored.
+#
+# Example entry:
+#     is|a,us,um
+#
+# Explanation:
+# The text before the pipe '|' character is the suffix to match.  If the match
+# is successful then all comma-separated entries are tried in turn.  E.g., for
+# the example given above, if the word supplied is 'portis', then the possible
+# alternates given are 'porta', 'portus', 'portum'.
+
+# F 1st sg.
+ae|a
+am|a
+
+# F 1st pl.
+ae|a
+arum|a
+is|a
+as|a
+
+# M 2nd sg.
+i|us
+o|us
+um|us
+e|us
+
+# M 2nd pl.
+i|us
+orum|us
+is|us
+os|us
+
+# N 2nd sg.
+i|um
+o|um
+
+# N 2nd pl.
+a|um
+orum|um
+is|um
+
+# 1st/2nd adj.
+a|us
+ae|us
+am|us
+arum|us
+as|us

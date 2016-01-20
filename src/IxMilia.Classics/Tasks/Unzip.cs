@@ -29,6 +29,7 @@ namespace IxMilia.Classics.Tasks
                     Directory.CreateDirectory(directory);
                     if (OverwriteExisting || !File.Exists(destinationFile))
                     {
+                        Log.LogMessage($"Unzipping to {destinationFile}");
                         using (var entryStream = entry.Open())
                         using (var outputFile = new FileStream(destinationFile, FileMode.Create))
                         {

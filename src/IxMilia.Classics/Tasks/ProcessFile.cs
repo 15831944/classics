@@ -19,15 +19,21 @@ namespace IxMilia.Classics.Tasks
         public string Dictionary { get; set; }
 
         [Required]
+        public string SuffixFile { get; set; }
+
+        [Required]
         public string Output { get; set; }
 
-        private const string QueSuffix = "que";
+        public int MaxLines { get; set; }
+
+        private readonly Dictionary<string, HashSet<string>> _suffixes = new Dictionary<string, HashSet<string>>();
+        private readonly Dictionary<string, DictionaryEntry> _entries = new Dictionary<string, DictionaryEntry>();
         private readonly Regex _wordMatcher = new Regex("[a-zA-Z]+", RegexOptions.Compiled);
-        private readonly Regex _definitionMatcher = new Regex(@"^#(.*)  (.*) +\[....\] :: (.*);\s+$", RegexOptions.Compiled);
+        private readonly Regex _definitionMatcher = new Regex(@"^#(.*)  ([A-Z].*)\[(.....)\] :: (.*)$", RegexOptions.Compiled);
         //                                                        ^^^^ word
-        //                                                              ^^^^ part of speech
-        //                                                                    ^^^^^^^^ flags
-        //                                                                                ^^^^ definition
+        //                                                              ^^^^^^^^^ part of speech
+        //                                                                       ^^^^^^^^^^^ flags
+        //                                                                                      ^^^^ definition
 
         private int _bookNumber;
         private IEnumerable<XElement> _elements;
@@ -36,11 +42,17 @@ namespace IxMilia.Classics.Tasks
         public override bool Execute()
         {
             LoadFile();
+            LoadSuffixes();
             LoadDictionary();
 
             _currentLine = 1;
             foreach (var element in _elements)
             {
+                if (MaxLines > 0 && _currentLine > MaxLines)
+                {
+                    break;
+                }
+
                 AssertCurrentLineNumber(element);
                 switch (element.Name.LocalName)
                 {
@@ -48,11 +60,27 @@ namespace IxMilia.Classics.Tasks
                         break;
                     case "l":
                         var words = BreakLineIntoWords(element.Value);
-                        //Console.WriteLine($"Found words: [{string.Join("|", words)}]");
+                        foreach (var word in words)
+                        {
+                            var definition = TryDefine(word);
+                            if (definition == null)
+                            {
+                                Log.LogError($"Unable to define {word} on line {_currentLine}.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Found definition on line {_currentLine}: {word} = {definition.Entry} - {definition.Definition}");
+                            }
+                        }
 
                         _currentLine++;
                         break;
                 }
+            }
+
+            if (MaxLines > 0)
+            {
+                Log.LogError($"Failing the build because {nameof(MaxLines)} was specified.");
             }
 
             return true;
@@ -66,8 +94,31 @@ namespace IxMilia.Classics.Tasks
             _elements = content.Elements();
         }
 
+        private void LoadSuffixes()
+        {
+            var suffixLines = System.IO.File.ReadAllLines(SuffixFile)
+                .Where(line => !string.IsNullOrEmpty(line) && !line.StartsWith("#"));
+            foreach (var line in suffixLines)
+            {
+                var parts = line.Split("|".ToCharArray(), 2);
+                var suffix = parts[0];
+                var replacements = new HashSet<string>(parts[1].Split(",".ToCharArray()));
+                if (_suffixes.ContainsKey(suffix))
+                {
+                    // append more possibilities
+                    foreach (var existing in _suffixes[suffix])
+                    {
+                        replacements.Add(existing);
+                    }
+                }
+
+                _suffixes[suffix] = replacements;
+            }
+        }
+
         private void LoadDictionary()
         {
+            Log.LogMessage($"Building dictionary from {Dictionary}");
             foreach (var line in System.IO.File.ReadAllLines(Dictionary))
             {
                 // each line in the dictionary looks like this:
@@ -155,30 +206,49 @@ namespace IxMilia.Classics.Tasks
                 //   Y = Temp special code
                 //   Z = Sent by user, no dictionary reference
                 var match = _definitionMatcher.Match(line);
-                var word = match.Groups[1].Value;
-                var pos = match.Groups[2].Value;
-                var flags = match.Groups[3].Value;
-                var definition = match.Groups[4].Value;
+                var entry = match.Groups[1].Value.Trim();
+                var pos = match.Groups[2].Value.Trim();
+                var flags = match.Groups[3].Value.Trim();
+                var definition = match.Groups[4].Value.Trim();
+
+                // TODO: handle duplicate entries
+                _entries[GetEntryKey(entry)] = new DictionaryEntry(entry, definition, pos, flags);
             }
+        }
+
+        private DictionaryEntry TryDefine(string word)
+        {
+            // TODO: return IEnumerable<> and try to strip off common suffixes like -que and -ne
+            foreach (var possibleRoot in PossibleRootWords(word.ToLowerInvariant()))
+            {
+                if (_entries.ContainsKey(possibleRoot))
+                {
+                    // TODO: Find all possible definitions.  Error if more than one are found.  Need a way to force disambiguation.
+                    return _entries[possibleRoot];
+                }
+            }
+
+            return null;
         }
 
         private IEnumerable<string> BreakLineIntoWords(string line)
         {
-            return _wordMatcher.Matches(line).Cast<Match>().SelectMany(m => BreakCompoundWords(m.Value));
+            return _wordMatcher.Matches(line).Cast<Match>().Select(m => m.Value);
         }
 
-        private IEnumerable<string> BreakCompoundWords(string word)
+        private IEnumerable<string> PossibleRootWords(string word)
         {
-            if (word.EndsWith(QueSuffix))
+            yield return word;
+            foreach (var suffixKey in _suffixes)
             {
-                var prefix = word.Substring(0, word.Length - QueSuffix.Length);
-                var suffix = QueSuffix;
-                yield return prefix;
-                yield return suffix;
-            }
-            else
-            {
-                yield return word;
+                if (word.EndsWith(suffixKey.Key))
+                {
+                    var stem = word.Substring(0, word.Length - suffixKey.Key.Length);
+                    foreach (var potentialSufix in suffixKey.Value)
+                    {
+                        yield return stem + potentialSufix;
+                    }
+                }
             }
         }
 
@@ -192,6 +262,35 @@ namespace IxMilia.Classics.Tasks
                 {
                     throw new Exception($"Expected current line to be {line} but was {_currentLine}");
                 }
+            }
+        }
+
+        private static string GetEntryKey(string entry)
+        {
+            for (int i = 0; i < entry.Length; i++)
+            {
+                if (!char.IsLetter(entry[i]))
+                {
+                    return entry.Substring(0, i).ToLowerInvariant();
+                }
+            }
+
+            return entry.ToLowerInvariant();
+        }
+
+        private class DictionaryEntry
+        {
+            public string Entry { get; }
+            public string Definition { get; }
+            public string PartOfSpeech { get; }
+            public string Flags { get; }
+
+            public DictionaryEntry(string entry, string definition, string partOfSpeech, string flags)
+            {
+                Entry = entry;
+                Definition = definition;
+                PartOfSpeech = partOfSpeech;
+                Flags = flags;
             }
         }
     }
