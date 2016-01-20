@@ -68,3 +68,9 @@ that occur more than 10 times will also have an asterisk (*).
 
 Ideally this repo will never directly contain the classics texts or the
 dictionaries, but will instead be able to fetch them from online resources.
+
+### Usage
+
+``` bash
+msbuild Build.proj
+```
