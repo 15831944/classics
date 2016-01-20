@@ -43,7 +43,12 @@
     </Target>
 
     <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
-        <ProcessFile File="$(Downloads)\aeneid1.xml" Dictionary="$(Downloads)\DICTPAGE.RAW" SuffixFile="$(SourceDir)\LatinSuffixes.txt" Output="$(OutputPath)\Aeneid1.tex" MaxLines="4" />
+        <ProcessFile File="$(Downloads)\aeneid1.xml"
+                     Dictionary="$(Downloads)\DICTPAGE.RAW"
+                     SuffixFile="$(SourceDir)\LatinSuffixes.txt"
+                     SuffixWords="ne;que"
+                     Output="$(OutputPath)\Aeneid1.tex"
+                     MaxLines="4" />
     </Target>
 
     <Target Name="Clean">

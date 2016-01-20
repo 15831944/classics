@@ -22,6 +22,9 @@ namespace IxMilia.Classics.Tasks
         public string SuffixFile { get; set; }
 
         [Required]
+        public string[] SuffixWords { get; set; }
+
+        [Required]
         public string Output { get; set; }
 
         public int MaxLines { get; set; }
@@ -62,14 +65,17 @@ namespace IxMilia.Classics.Tasks
                         var words = BreakLineIntoWords(element.Value);
                         foreach (var word in words)
                         {
-                            var definition = TryDefine(word);
-                            if (definition == null)
+                            var definitions = GetDefinitions(word);
+                            if (definitions.Length == 0)
                             {
                                 Log.LogError($"Unable to define {word} on line {_currentLine}.");
                             }
                             else
                             {
-                                Console.WriteLine($"Found definition on line {_currentLine}: {word} = {definition.Entry} - {definition.Definition}");
+                                foreach (var definition in definitions)
+                                {
+                                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {definition.Entry} - {definition.Definition}");
+                                }
                             }
                         }
 
@@ -216,19 +222,33 @@ namespace IxMilia.Classics.Tasks
             }
         }
 
-        private DictionaryEntry TryDefine(string word)
+        private DictionaryEntry[] GetDefinitions(string word)
         {
-            // TODO: return IEnumerable<> and try to strip off common suffixes like -que and -ne
-            foreach (var possibleRoot in PossibleRootWords(word.ToLowerInvariant()))
+            word = word.ToLowerInvariant();
+            foreach (var possibleRoot in PossibleRootWords(word))
             {
                 if (_entries.ContainsKey(possibleRoot))
                 {
                     // TODO: Find all possible definitions.  Error if more than one are found.  Need a way to force disambiguation.
-                    return _entries[possibleRoot];
+                    return new[] { _entries[possibleRoot] };
                 }
             }
 
-            return null;
+            foreach (var suffixWord in SuffixWords.Select(s => s.ToLowerInvariant()))
+            {
+                var suffixDefinitions = GetDefinitions(suffixWord);
+                if (suffixDefinitions.Length > 0 && word.EndsWith(suffixWord))
+                {
+                    word = word.Substring(0, word.Length - suffixWord.Length);
+                    var def = GetDefinitions(word);
+                    if (def.Length > 0)
+                    {
+                        return def.Concat(suffixDefinitions).ToArray();
+                    }
+                }
+            }
+
+            return Array.Empty<DictionaryEntry>();
         }
 
         private IEnumerable<string> BreakLineIntoWords(string line)
