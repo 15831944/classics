@@ -60,7 +60,7 @@ output would look something like this...
 
 ...with an additional list of the most common (250 or so) words and their
 definitions.  Any word in the source text that occurs in the common list will
-italicized with other words being romanized.
+be italicized with other words being romanized.
 
 A vocabulary item on an inividual page will have a dagger (&dagger;) after its
 definition if it is the first occurence of that word in the work.  Any words
