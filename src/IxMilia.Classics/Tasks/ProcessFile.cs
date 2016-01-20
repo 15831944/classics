@@ -41,6 +41,8 @@ namespace IxMilia.Classics.Tasks
         private int _bookNumber;
         private IEnumerable<XElement> _elements;
         private int _currentLine;
+        private int _definedWords;
+        private int _undefinedWords;
 
         public override bool Execute()
         {
@@ -49,6 +51,8 @@ namespace IxMilia.Classics.Tasks
             LoadDictionary();
 
             _currentLine = 1;
+            _definedWords = 0;
+            _undefinedWords = 0;
             foreach (var element in _elements)
             {
                 if (MaxLines > 0 && _currentLine > MaxLines)
@@ -68,10 +72,12 @@ namespace IxMilia.Classics.Tasks
                             var definitions = GetDefinitions(word);
                             if (definitions.Length == 0)
                             {
+                                _undefinedWords++;
                                 Log.LogError($"Unable to define {word} on line {_currentLine}.");
                             }
                             else
                             {
+                                _definedWords += definitions.Length;
                                 foreach (var definition in definitions)
                                 {
                                     Console.WriteLine($"Found definition on line {_currentLine}: {word} = {definition.Entry} - {definition.Definition}");
@@ -88,6 +94,8 @@ namespace IxMilia.Classics.Tasks
             {
                 Log.LogError($"Failing the build because {nameof(MaxLines)} was specified.");
             }
+
+            Log.LogMessage($"Defined {_definedWords} words with {_undefinedWords} undefined.  {_definedWords * 100.0 / (_definedWords + _undefinedWords)}% success rate.");
 
             return true;
         }
