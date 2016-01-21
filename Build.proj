@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Copyright (c) IxMilia.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information. -->
-<Project
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
-  DefaultTargets="Build"
-  ToolsVersion="12.0">
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"
+         DefaultTargets="Build"
+         ToolsVersion="12.0">
+
+    <ImportGroup>
+        <Import Project="$(MSBuildThisFileDirectory)src\Targets\IxMilia.targets" />
+    </ImportGroup>
 
     <PropertyGroup>
         <Downloads Condition="'$(Downloads)' == ''">$(MSBuildThisFileDirectory)Downloads</Downloads>
@@ -25,8 +28,6 @@
                  Targets="Build" />
     </Target>
 
-    <UsingTask TaskName="DownloadFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
-    <UsingTask TaskName="Unzip" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
     <UsingTask TaskName="ProcessFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
 
     <Target Name="CreateDirectories">

@@ -9,6 +9,63 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
   </PropertyGroup>
 
+  <UsingTask TaskName="DownloadFile" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <Url ParameterType="System.String" Required="true" />
+      <Destination ParameterType="System.String" Required="true" />
+      <OverwriteExisting ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.IO.Compression" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Net" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            if (OverwriteExisting || !File.Exists(Destination))
+            {
+                Log.LogMessage("Downloading from " + Url);
+                new WebClient().DownloadFile(Url, Destination);
+            }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <UsingTask TaskName="Unzip" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll">
+    <ParameterGroup>
+      <Archive ParameterType="System.String" Required="true" />
+      <Destination ParameterType="System.String" Required="true" />
+      <OverwriteExisting ParameterType="System.Boolean" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.IO.Compression" />
+      <Using Namespace="System.IO.Compression" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+            using (var stream = new FileStream(Archive, FileMode.Open))
+            using (var archive = new ZipArchive(stream))
+            {
+                foreach (var entry in archive.Entries)
+                {
+                    var destinationFile = Path.Combine(Destination, entry.FullName);
+                    var directory = Path.GetDirectoryName(destinationFile);
+                    Directory.CreateDirectory(directory);
+                    if (OverwriteExisting || !File.Exists(destinationFile))
+                    {
+                        Log.LogMessage("Unzipping to " + destinationFile);
+                        using (var entryStream = entry.Open())
+                        using (var outputFile = new FileStream(destinationFile, FileMode.Create))
+                        {
+                            entryStream.CopyTo(outputFile);
+                        }
+                    }
+                }
+            }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
   <!-- Common project settings -->
   <PropertyGroup>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
