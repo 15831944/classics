@@ -8,7 +8,7 @@ using System.Xml.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace IxMilia.Classics.Tasks
+namespace IxMilia.Classics.BuildTasks
 {
     public class ProcessFile : Task
     {

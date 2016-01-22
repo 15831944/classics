@@ -23,12 +23,12 @@
 
     <Target Name="BuildTasks">
         <MSBuild BuildInParallel="true"
-                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.BuildTasks\IxMilia.Classics.BuildTasks.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Build" />
     </Target>
 
-    <UsingTask TaskName="ProcessFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.dll" />
+    <UsingTask TaskName="ProcessFile" AssemblyFile="src\Binaries\$(Configuration)\IxMilia.Classics.BuildTasks.dll" />
 
     <Target Name="CreateDirectories">
         <MakeDir Directories="@(DirectoriesToClean)" />
@@ -55,7 +55,7 @@
     <Target Name="Clean">
         <RemoveDir Directories="@(DirectoriesToClean)" />
         <MSBuild BuildInParallel="true"
-                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.BuildTasks\IxMilia.Classics.BuildTasks.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Clean" />
     </Target>

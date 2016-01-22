@@ -10,8 +10,8 @@
     <ProjectGuid>{0F0AEB88-F742-473A-9573-DBF9F87F5BBE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IxMilia.Classics</RootNamespace>
-    <AssemblyName>IxMilia.Classics</AssemblyName>
+    <RootNamespace>IxMilia.Classics.BuildTasks</RootNamespace>
+    <AssemblyName>IxMilia.Classics.BuildTasks</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
@@ -28,8 +28,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ProcessFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tasks\ProcessFile.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
