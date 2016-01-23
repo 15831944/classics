@@ -9,19 +9,23 @@
     </ImportGroup>
 
     <PropertyGroup>
-        <Downloads Condition="'$(Downloads)' == ''">$(MSBuildThisFileDirectory)Downloads</Downloads>
+        <DownloadDir Condition="'$(DownloadDir)' == ''">$(MSBuildThisFileDirectory)Downloads</DownloadDir>
         <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)Output</OutputPath>
         <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     </PropertyGroup>
 
     <ItemGroup>
-        <DirectoriesToClean Include="$(Downloads)" />
+        <DirectoriesToClean Include="$(DownloadDir)" />
         <DirectoriesToClean Include="$(OutputPath)" />
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
 
     <Target Name="BuildTasks">
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Build" />
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.BuildTasks\IxMilia.Classics.BuildTasks.csproj"
                  Properties="TreatWarningsAsErrors=true"
@@ -36,24 +40,21 @@
 
     <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
         <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
-                      Destination="$(Downloads)\aeneid1.xml" />
-        <DownloadFile Url="http://archives.nd.edu/whitaker/dictpage.zip"
-                      Destination="$(Downloads)\dictpage.zip" />
-        <Unzip Archive="$(Downloads)\dictpage.zip"
-               Destination="$(Downloads)" />
+                      Destination="$(DownloadDir)\aeneid1.xml" />
     </Target>
 
     <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
-        <ProcessFile File="$(Downloads)\aeneid1.xml"
-                     Dictionary="$(Downloads)\DICTPAGE.RAW"
-                     SuffixFile="$(SourceDir)\LatinSuffixes.txt"
-                     SuffixWords="ne;que"
+        <ProcessFile File="$(DownloadDir)\aeneid1.xml"
                      Output="$(OutputPath)\Aeneid1.tex"
                      MaxLines="4" />
     </Target>
 
     <Target Name="Clean">
         <RemoveDir Directories="@(DirectoriesToClean)" />
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Clean" />
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.BuildTasks\IxMilia.Classics.BuildTasks.csproj"
                  Properties="TreatWarningsAsErrors=true"

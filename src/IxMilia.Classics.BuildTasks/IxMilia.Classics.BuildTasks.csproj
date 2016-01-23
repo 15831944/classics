@@ -31,5 +31,11 @@
     <Compile Include="ProcessFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IxMilia.Classics\IxMilia.Classics.csproj">
+      <Project>{d4d00134-ccc8-4b32-8f66-1aea028e79e2}</Project>
+      <Name>IxMilia.Classics</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
