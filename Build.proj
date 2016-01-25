@@ -13,6 +13,10 @@
         <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)Output</OutputPath>
         <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+        <SolutionDir>$(MSBuildThisFileDirectory)src</SolutionDir>
+        <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
+        <TestAssembly>$(SolutionDir)\Binaries\$(Configuration)\IxMilia.Classics.Test.dll</TestAssembly>
+        <NuGetExe>$(MSBuildThisFileDirectory)src\.nuget\NuGet.exe</NuGetExe>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +24,11 @@
         <DirectoriesToClean Include="$(OutputPath)" />
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
+
+    <Target Name="RestorePackages">
+        <DownloadFile Url="https://www.nuget.org/nuget.exe" Destination="$(NuGetExe)" />
+        <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot;" />
+    </Target>
 
     <Target Name="BuildTasks">
         <MSBuild BuildInParallel="true"
@@ -43,16 +52,28 @@
                       Destination="$(DownloadDir)\aeneid1.xml" />
     </Target>
 
-    <Target Name="Build" DependsOnTargets="BuildTasks;DownloadSources">
+    <Target Name="Build" DependsOnTargets="RestorePackages;BuildTasks;DownloadSources">
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
                      Output="$(OutputPath)\Aeneid1.tex"
                      MaxLines="4" />
+    </Target>
+
+    <Target Name="Test" DependsOnTargets="Build">
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Test\IxMilia.Classics.Test.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Build" />
+        <Exec Command="$(MSBuildThisFileDirectory)src\packages\xunit.runners.1.9.2\tools\xunit.console.clr4.exe $(TestAssembly)" />
     </Target>
 
     <Target Name="Clean">
         <RemoveDir Directories="@(DirectoriesToClean)" />
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Clean" />
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Test\IxMilia.Classics.Test.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Clean" />
         <MSBuild BuildInParallel="true"

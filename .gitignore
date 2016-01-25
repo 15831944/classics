@@ -2,3 +2,5 @@
 Binaries/
 Downloads/
 obj/
+packages/
+NuGet.exe
