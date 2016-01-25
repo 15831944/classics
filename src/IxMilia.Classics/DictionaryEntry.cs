@@ -34,10 +34,10 @@ namespace IxMilia.Classics
             switch (Type)
             {
                 case WordType.Noun:
-                    yield return new NounStem(Declension, Gender, EntryKey, this);
+                    yield return new NounStem(Declension, Gender, EntryKey.Substring(0, EntryKey.Length - 1), this);
                     break;
                 default:
-                    throw new NotImplementedException();
+                    break;
             }
         }
 

@@ -52,18 +52,18 @@ namespace IxMilia.Classics.BuildTasks
                         var words = BreakLineIntoWords(element.Value);
                         foreach (var word in words)
                         {
-                            var definitions = latin.GetDefinitions(word);
-                            if (definitions.Length == 0)
+                            var matchedForms = latin.GetDefinitions(word).ToArray();
+                            if (matchedForms.Length == 0)
                             {
                                 _undefinedWords++;
                                 Log.LogError($"Unable to define {word} on line {_currentLine}.");
                             }
                             else
                             {
-                                _definedWords += definitions.Length;
-                                foreach (var definition in definitions)
+                                _definedWords++;
+                                foreach (var matchedForm in matchedForms)
                                 {
-                                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {definition.Entry} - {definition.Definition}");
+                                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {matchedForm.Key.Entry} - {matchedForm.Key.Definition}");
                                 }
                             }
                         }

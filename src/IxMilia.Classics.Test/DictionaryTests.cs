@@ -9,7 +9,7 @@ namespace IxMilia.Classics.Test
     {
         static readonly LatinDictionary Latin = new LatinDictionary();
 
-        private DictionaryEntry GetSingleEntry(string word)
+        private IGrouping<DictionaryEntry, WordForm> GetSingleEntry(string word)
         {
             return Latin.GetDefinitions(word).Single();
         }
@@ -17,9 +17,9 @@ namespace IxMilia.Classics.Test
         [Fact]
         public void NounPartOfSpeechParseTest()
         {
-            var word = GetSingleEntry("porta");
-            Assert.Equal(Declension.First, word.Declension);
-            Assert.Equal(Gender.Feminine, word.Gender);
+            var entry = GetSingleEntry("porta").Key;
+            Assert.Equal(Declension.First, entry.Declension);
+            Assert.Equal(Gender.Feminine, entry.Gender);
         }
     }
 }

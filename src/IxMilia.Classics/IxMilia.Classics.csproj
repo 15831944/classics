@@ -23,8 +23,8 @@
     <Compile Include="Declension.cs" />
     <Compile Include="DictionaryEntry.cs" />
     <Compile Include="Gender.cs" />
-    <Compile Include="GeneratedNoun.cs" />
-    <Compile Include="GeneratedWord.cs" />
+    <Compile Include="NounForm.cs" />
+    <Compile Include="WordForm.cs" />
     <Compile Include="LatinDictionary.cs" />
     <Compile Include="NounStem.cs" />
     <Compile Include="Number.cs" />

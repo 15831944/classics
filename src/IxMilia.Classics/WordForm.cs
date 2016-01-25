@@ -2,12 +2,12 @@
 
 namespace IxMilia.Classics
 {
-    public abstract class GeneratedWord
+    public abstract class WordForm
     {
         public Stem Stem { get; }
         public string Suffix { get; }
 
-        protected GeneratedWord(Stem stem, string suffix)
+        protected WordForm(Stem stem, string suffix)
         {
             Stem = stem;
             Suffix = suffix;

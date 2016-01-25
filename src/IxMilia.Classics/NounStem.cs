@@ -16,21 +16,21 @@ namespace IxMilia.Classics
             Gender = gender;
         }
 
-        public IEnumerable<GeneratedNoun> GetGeneratedForms()
+        public override IEnumerable<WordForm> GetGeneratedForms()
         {
-            yield return new GeneratedNoun(this, Case.Nominative, Number.Singluar, "a");
-            yield return new GeneratedNoun(this, Case.Genitive, Number.Singluar, "ae");
-            yield return new GeneratedNoun(this, Case.Dative, Number.Singluar, "ae");
-            yield return new GeneratedNoun(this, Case.Accusative, Number.Singluar, "am");
-            yield return new GeneratedNoun(this, Case.Ablative, Number.Singluar, "a");
-            yield return new GeneratedNoun(this, Case.Vocative, Number.Singluar, "a");
+            yield return new NounForm(this, Case.Nominative, Number.Singluar, "a");
+            yield return new NounForm(this, Case.Genitive, Number.Singluar, "ae");
+            yield return new NounForm(this, Case.Dative, Number.Singluar, "ae");
+            yield return new NounForm(this, Case.Accusative, Number.Singluar, "am");
+            yield return new NounForm(this, Case.Ablative, Number.Singluar, "a");
+            yield return new NounForm(this, Case.Vocative, Number.Singluar, "a");
 
-            yield return new GeneratedNoun(this, Case.Nominative, Number.Plural, "ae");
-            yield return new GeneratedNoun(this, Case.Genitive, Number.Plural, "arum");
-            yield return new GeneratedNoun(this, Case.Dative, Number.Plural, "is");
-            yield return new GeneratedNoun(this, Case.Accusative, Number.Plural, "as");
-            yield return new GeneratedNoun(this, Case.Ablative, Number.Plural, "is");
-            yield return new GeneratedNoun(this, Case.Vocative, Number.Plural, "ae");
+            yield return new NounForm(this, Case.Nominative, Number.Plural, "ae");
+            yield return new NounForm(this, Case.Genitive, Number.Plural, "arum");
+            yield return new NounForm(this, Case.Dative, Number.Plural, "is");
+            yield return new NounForm(this, Case.Accusative, Number.Plural, "as");
+            yield return new NounForm(this, Case.Ablative, Number.Plural, "is");
+            yield return new NounForm(this, Case.Vocative, Number.Plural, "ae");
         }
     }
 }

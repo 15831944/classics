@@ -10,8 +10,7 @@ namespace IxMilia.Classics
 {
     public class LatinDictionary
     {
-        private readonly Dictionary<string, HashSet<string>> _suffixes = new Dictionary<string, HashSet<string>>();
-        private readonly Dictionary<string, DictionaryEntry> _entries = new Dictionary<string, DictionaryEntry>();
+        private readonly List<DictionaryEntry> _entries = new List<DictionaryEntry>();
         private readonly Regex _definitionMatcher = new Regex(@"^#(.*)  ([A-Z].*)\[(.....)\] :: (.*)$");
         //                                                        ^^^^ word
         //                                                              ^^^^^^^^^ part of speech
@@ -20,85 +19,36 @@ namespace IxMilia.Classics
 
         private Assembly CurrentAssembly => typeof(LatinDictionary).GetTypeInfo().Assembly;
 
-        private IEnumerable<string> SuffixWords => new[] { "ne", "que" };
-
         public LatinDictionary()
         {
-            LoadSuffixes();
             LoadDictionary();
         }
 
-        public DictionaryEntry[] GetDefinitions(string word)
+        public IEnumerable<IGrouping<DictionaryEntry, WordForm>> GetDefinitions(string word)
         {
             word = word.ToLowerInvariant();
-            foreach (var possibleRoot in PossibleRootWords(word))
-            {
-                if (_entries.ContainsKey(possibleRoot))
-                {
-                    // TODO: Find all possible definitions.  Error if more than one are found.  Need a way to force disambiguation.
-                    return new[] { _entries[possibleRoot] };
-                }
-            }
 
-            foreach (var suffixWord in SuffixWords.Select(s => s.ToLowerInvariant()))
+            // TODO: n^3 linear search hurts my soul; precompute and cache stems in a trie
+            var matches = new HashSet<WordForm>();
+            foreach (var entry in _entries)
             {
-                var suffixDefinitions = GetDefinitions(suffixWord);
-                if (suffixDefinitions.Length > 0 && word.EndsWith(suffixWord))
+                foreach (var stem in entry.GetStems())
                 {
-                    word = word.Substring(0, word.Length - suffixWord.Length);
-                    var def = GetDefinitions(word);
-                    if (def.Length > 0)
+                    if (word.StartsWith(stem.StemPart))
                     {
-                        return def.Concat(suffixDefinitions).ToArray();
+                        foreach (var form in stem.GetGeneratedForms())
+                        {
+                            // TODO: handle suffix words like "ne" and "que"
+                            if (word == form.Stem.StemPart + form.Suffix)
+                            {
+                                matches.Add(form);
+                            }
+                        }
                     }
                 }
             }
 
-            return new DictionaryEntry[0];
-        }
-
-        private IEnumerable<string> PossibleRootWords(string word)
-        {
-            yield return word;
-            foreach (var suffixKey in _suffixes)
-            {
-                if (word.EndsWith(suffixKey.Key))
-                {
-                    var stem = word.Substring(0, word.Length - suffixKey.Key.Length);
-                    foreach (var potentialSufix in suffixKey.Value)
-                    {
-                        yield return stem + potentialSufix;
-                    }
-                }
-            }
-        }
-
-        private void LoadSuffixes()
-        {
-            var suffixStream = CurrentAssembly.GetManifestResourceStream("IxMilia.Classics.LatinSuffixes.txt");
-            var streamReader = new StreamReader(suffixStream);
-            for (var line = streamReader.ReadLine(); line != null; line = streamReader.ReadLine())
-            {
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
-                {
-                    // skip blank and comment lines
-                    continue;
-                }
-
-                var parts = line.Split("|".ToCharArray(), 2);
-                var suffix = parts[0];
-                var replacements = new HashSet<string>(parts[1].Split(",".ToCharArray()));
-                if (_suffixes.ContainsKey(suffix))
-                {
-                    // append more possibilities
-                    foreach (var existing in _suffixes[suffix])
-                    {
-                        replacements.Add(existing);
-                    }
-                }
-
-                _suffixes[suffix] = replacements;
-            }
+            return matches.GroupBy(m => m.Stem.Entry);
         }
 
         private void LoadDictionary()
@@ -197,9 +147,7 @@ namespace IxMilia.Classics
                 var flags = match.Groups[3].Value.Trim();
                 var definition = match.Groups[4].Value.Trim();
 
-                // TODO: handle duplicate entries
-                var dictionaryEntry = new DictionaryEntry(entry, definition, pos, flags);
-                _entries[dictionaryEntry.EntryKey] = dictionaryEntry;
+                _entries.Add(new DictionaryEntry(entry, definition, pos, flags));
             }
         }
     }

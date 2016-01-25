@@ -2,13 +2,13 @@
 
 namespace IxMilia.Classics
 {
-    public class GeneratedNoun : GeneratedWord
+    public class NounForm : WordForm
     {
         public new NounStem Stem { get; }
         public Case Case { get; }
         public Number Number { get; }
 
-        public GeneratedNoun(NounStem stem, Case @case, Number number, string suffix)
+        public NounForm(NounStem stem, Case @case, Number number, string suffix)
             : base(stem, suffix)
         {
             Stem = stem;
