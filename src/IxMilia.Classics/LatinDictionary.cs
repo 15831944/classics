@@ -198,21 +198,9 @@ namespace IxMilia.Classics
                 var definition = match.Groups[4].Value.Trim();
 
                 // TODO: handle duplicate entries
-                _entries[GetEntryKey(entry)] = new DictionaryEntry(entry, definition, pos, flags);
+                var dictionaryEntry = new DictionaryEntry(entry, definition, pos, flags);
+                _entries[dictionaryEntry.EntryKey] = dictionaryEntry;
             }
-        }
-
-        private static string GetEntryKey(string entry)
-        {
-            for (int i = 0; i < entry.Length; i++)
-            {
-                if (!char.IsLetter(entry[i]))
-                {
-                    return entry.Substring(0, i).ToLowerInvariant();
-                }
-            }
-
-            return entry.ToLowerInvariant();
         }
     }
 }

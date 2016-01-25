@@ -19,11 +19,18 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
   <ItemGroup>
+    <Compile Include="Case.cs" />
     <Compile Include="Declension.cs" />
     <Compile Include="DictionaryEntry.cs" />
     <Compile Include="Gender.cs" />
+    <Compile Include="GeneratedNoun.cs" />
+    <Compile Include="GeneratedWord.cs" />
     <Compile Include="LatinDictionary.cs" />
+    <Compile Include="NounStem.cs" />
+    <Compile Include="Number.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Stem.cs" />
+    <Compile Include="WordType.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(DownloadDir)\DICTPAGE.RAW" />

@@ -32,10 +32,6 @@
 
     <Target Name="BuildTasks">
         <MSBuild BuildInParallel="true"
-                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
-                 Properties="TreatWarningsAsErrors=true"
-                 Targets="Build" />
-        <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.BuildTasks\IxMilia.Classics.BuildTasks.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Build" />
@@ -52,7 +48,14 @@
                       Destination="$(DownloadDir)\aeneid1.xml" />
     </Target>
 
-    <Target Name="Build" DependsOnTargets="RestorePackages;BuildTasks;DownloadSources">
+    <Target Name="Build" DependsOnTargets="RestorePackages">
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Build" />
+    </Target>
+
+    <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
                      Output="$(OutputPath)\Aeneid1.tex"
                      MaxLines="4" />
