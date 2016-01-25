@@ -5,12 +5,12 @@ namespace IxMilia.Classics
     public abstract class WordForm
     {
         public Stem Stem { get; }
-        public string Suffix { get; }
+        public string Form { get; }
 
-        protected WordForm(Stem stem, string suffix)
+        protected WordForm(Stem stem, string form)
         {
             Stem = stem;
-            Suffix = suffix;
+            Form = form;
         }
     }
 }

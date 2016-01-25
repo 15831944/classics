@@ -39,7 +39,7 @@ namespace IxMilia.Classics
                         foreach (var form in stem.GetGeneratedForms())
                         {
                             // TODO: handle suffix words like "ne" and "que"
-                            if (word == form.Stem.StemPart + form.Suffix)
+                            if (word == form.Form)
                             {
                                 matches.Add(form);
                             }

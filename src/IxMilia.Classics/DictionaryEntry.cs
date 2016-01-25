@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace IxMilia.Classics
@@ -34,11 +35,47 @@ namespace IxMilia.Classics
             switch (Type)
             {
                 case WordType.Noun:
-                    yield return new NounStem(Declension, Gender, EntryKey.Substring(0, EntryKey.Length - 1), this);
+                    yield return new NounStem(EntryKey, GetNounGenitiveStem(), Declension, Gender, this);
                     break;
                 default:
                     break;
             }
+        }
+
+        private string GetNounGenitiveStem()
+        {
+            var parts = Entry.Split(",".ToCharArray());
+            var genitive = parts[1].Trim();
+
+            // TODO: better handle some genitive forms having an extra optional (i)
+            genitive = genitive.Replace("(i)", "i");
+            if (genitive == "-")
+            {
+                // some words don't exist outside of the nominative
+                return string.Empty;
+            }
+
+            switch (Declension)
+            {
+                case Declension.First:
+                    return RemoveSuffix(genitive, "ae");
+                case Declension.Second:
+                    return RemoveSuffix(genitive, "i");
+                case Declension.Third:
+                    return RemoveSuffix(genitive, "is");
+                case Declension.Fourth:
+                    return genitive.EndsWith("us") ? RemoveSuffix(genitive, "us") : RemoveSuffix(genitive, "u");
+                case Declension.Fifth:
+                    return RemoveSuffix(genitive, "ei");
+                default:
+                    throw new InvalidOperationException();
+            }
+        }
+
+        private static string RemoveSuffix(string text, string suffix)
+        {
+            Debug.Assert(text.EndsWith(suffix));
+            return text.Substring(0, text.Length - suffix.Length);
         }
 
         private void ParsePartOfSpeech(string pos)

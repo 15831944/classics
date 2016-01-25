@@ -11,15 +11,33 @@ namespace IxMilia.Classics.Test
 
         private IGrouping<DictionaryEntry, WordForm> GetSingleEntry(string word)
         {
-            return Latin.GetDefinitions(word).Single();
+            var definitions = Latin.GetDefinitions(word);
+            return definitions.Single();
+        }
+
+        private void AssertNounType(string word, Declension declension, Gender gender)
+        {
+            var entry = GetSingleEntry(word).Key;
+            Assert.Equal(declension, entry.Declension);
+            Assert.Equal(gender, entry.Gender);
         }
 
         [Fact]
-        public void NounPartOfSpeechParseTest()
+        public void NounPartOfSpeechParseTest1()
         {
-            var entry = GetSingleEntry("porta").Key;
-            Assert.Equal(Declension.First, entry.Declension);
-            Assert.Equal(Gender.Feminine, entry.Gender);
+            AssertNounType("porta", Declension.First, Gender.Feminine);
+        }
+
+        [Fact]
+        public void NounPartOfSpeechParseTest2()
+        {
+            AssertNounType("annus", Declension.Second, Gender.Masculine);
+        }
+
+        [Fact]
+        public void NounPartOfSpeechParseTest3()
+        {
+            AssertNounType("vir", Declension.Second, Gender.Masculine);
         }
     }
 }

@@ -8,8 +8,8 @@ namespace IxMilia.Classics
         public Case Case { get; }
         public Number Number { get; }
 
-        public NounForm(NounStem stem, Case @case, Number number, string suffix)
-            : base(stem, suffix)
+        public NounForm(NounStem stem, Case @case, Number number, string form)
+            : base(stem, form)
         {
             Stem = stem;
             Case = @case;
