@@ -4,7 +4,6 @@ namespace IxMilia.Classics
 {
     public enum Gender
     {
-        None,
         Masculine,
         Feminine,
         Neuter

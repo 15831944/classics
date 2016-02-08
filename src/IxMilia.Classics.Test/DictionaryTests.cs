@@ -17,7 +17,7 @@ namespace IxMilia.Classics.Test
 
         private void AssertNounType(string word, Declension declension, Gender gender)
         {
-            var entry = GetSingleEntry(word).Key;
+            var entry = (NounEntry)GetSingleEntry(word).Key;
             Assert.Equal(declension, entry.Declension);
             Assert.Equal(gender, entry.Gender);
         }

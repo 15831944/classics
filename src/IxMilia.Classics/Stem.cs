@@ -15,6 +15,6 @@ namespace IxMilia.Classics
             Entry = entry;
         }
 
-        public abstract IEnumerable<WordForm> GetGeneratedForms();
+        public abstract IEnumerable<WordForm> GetForms();
     }
 }

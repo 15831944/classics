@@ -4,14 +4,12 @@ namespace IxMilia.Classics
 {
     public class NounForm : WordForm
     {
-        public new NounStem Stem { get; }
         public Case Case { get; }
         public Number Number { get; }
 
-        public NounForm(NounStem stem, Case @case, Number number, string form)
-            : base(stem, form)
+        internal NounForm(Stem stem, Case @case, Number number, string suffix)
+            : base(stem, suffix)
         {
-            Stem = stem;
             Case = @case;
             Number = number;
         }

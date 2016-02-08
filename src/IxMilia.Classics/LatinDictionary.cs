@@ -36,10 +36,10 @@ namespace IxMilia.Classics
                 {
                     if (word.StartsWith(stem.StemPart))
                     {
-                        foreach (var form in stem.GetGeneratedForms())
+                        foreach (var form in stem.GetForms())
                         {
                             // TODO: handle suffix words like "ne" and "que"
-                            if (word == form.Form)
+                            if (word == form.Stem.StemPart + form.Suffix)
                             {
                                 matches.Add(form);
                             }
@@ -147,7 +147,11 @@ namespace IxMilia.Classics
                 var flags = match.Groups[3].Value.Trim();
                 var definition = match.Groups[4].Value.Trim();
 
-                _entries.Add(new DictionaryEntry(entry, definition, pos, flags));
+                var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
+                if (dictEntry != null)
+                {
+                    _entries.Add(dictEntry);
+                }
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace IxMilia.Classics
 {
-    public enum WordType
+    public enum PartOfSpeech
     {
         Unknown,
         Noun,
