@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.Build.Framework;
@@ -16,7 +18,7 @@ namespace IxMilia.Classics.BuildTasks
         public string File { get; set; }
 
         [Required]
-        public string Output { get; set; }
+        public string OutputPath { get; set; }
 
         public int MaxLines { get; set; }
 
@@ -32,6 +34,11 @@ namespace IxMilia.Classics.BuildTasks
         {
             LoadFile();
             var latin = new LatinDictionary();
+
+            var content = new StringBuilder();
+            var uncommonWords = new Dictionary<string, Tuple<string, string>>();
+
+            content.AppendLine(@"\newchapter{Book 1}");
 
             _currentLine = 1;
             _definedWords = 0;
@@ -49,10 +56,12 @@ namespace IxMilia.Classics.BuildTasks
                     case "milestone":
                         break;
                     case "l":
-                        var words = BreakLineIntoWords(element.Value);
+                        content.Append(@"\lline{");
+                        var words = BreakLineIntoWords(element.Value); // TODO: don't drop punctuation
                         foreach (var word in words)
                         {
                             var matchedForms = latin.GetDefinitions(word).ToArray();
+                            bool defined = false;
                             if (matchedForms.Length == 0)
                             {
                                 _undefinedWords++;
@@ -61,17 +70,36 @@ namespace IxMilia.Classics.BuildTasks
                             else
                             {
                                 _definedWords++;
+                                if (matchedForms.Count() == 1)
+                                {
+                                    // assume all words are uncommon for now
+                                    var form = matchedForms.Single().Key;
+                                    content.Append($@"\uncom[{form.EntryKey}]{{{word}}} ");
+                                    defined = true;
+                                }
+
                                 foreach (var matchedForm in matchedForms)
                                 {
+                                    uncommonWords[matchedForm.Key.EntryKey] = Tuple.Create(matchedForm.Key.Entry, matchedForm.Key.Definition);
                                     Console.WriteLine($"Found definition on line {_currentLine}: {word} = {matchedForm.Key.Entry} - {matchedForm.Key.Definition}");
                                 }
                             }
+
+                            if (!defined)
+                            {
+                                content.Append(word + " ");
+                            }
                         }
 
+                        content.AppendLine("}");
                         _currentLine++;
                         break;
                 }
             }
+
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "content.tex"), content.ToString());
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), "");
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{kvp.Key}}}{{name={{{kvp.Value.Item1}}},description={{{kvp.Value.Item2}}}}}")));
 
             if (MaxLines > 0)
             {

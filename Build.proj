@@ -10,18 +10,25 @@
 
     <PropertyGroup>
         <DownloadDir Condition="'$(DownloadDir)' == ''">$(MSBuildThisFileDirectory)Downloads</DownloadDir>
-        <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)Output</OutputPath>
+        <ResultPath Condition="'$(ResultPath)' == ''">$(MSBuildThisFileDirectory)Output</ResultPath>
         <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
+        <LaTeXPath Condition="'$(LaTeXPath)' == ''">$(SourceDir)\LaTeX</LaTeXPath>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <SolutionDir>$(MSBuildThisFileDirectory)src</SolutionDir>
         <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
         <TestAssembly>$(SolutionDir)\Binaries\$(Configuration)\IxMilia.Classics.Test.dll</TestAssembly>
         <NuGetExe>$(MSBuildThisFileDirectory)src\.nuget\NuGet.exe</NuGetExe>
+        <PdfLatexExe>pdflatex</PdfLatexExe>
+        <MakeIndexExe>makeindex</MakeIndexExe>
     </PropertyGroup>
 
     <ItemGroup>
+        <LaTeXFiles Include="$(LaTeXPath)\Aeneid.tex" />
+    </ItemGroup>
+
+    <ItemGroup>
         <DirectoriesToClean Include="$(DownloadDir)" />
-        <DirectoriesToClean Include="$(OutputPath)" />
+        <DirectoriesToClean Include="$(ResultPath)" />
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
 
@@ -56,9 +63,15 @@
     </Target>
 
     <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
+        <Copy SourceFiles="@(LaTeXFiles)" DestinationFolder="$(ResultPath)" />
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
-                     Output="$(OutputPath)\Aeneid1.tex"
-                     MaxLines="4" />
+                     OutputPath="$(ResultPath)"
+                     MaxLines="20" />
+        <Exec Command="$(PdfLatexExe) Aeneid.tex" WorkingDirectory="$(ResultPath)" IgnoreExitCode="true" />
+        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.gls Aeneid.glo" WorkingDirectory="$(ResultPath)" />
+        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.common-gls Aeneid.common-glo" WorkingDirectory="$(ResultPath)" />
+        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.uncommon-gls Aeneid.uncommon-glo" WorkingDirectory="$(ResultPath)" />
+        <Exec Command="$(PdfLatexExe) Aeneid.tex" WorkingDirectory="$(ResultPath)" />
     </Target>
 
     <Target Name="Test" DependsOnTargets="Build">

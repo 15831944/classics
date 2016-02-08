@@ -142,10 +142,10 @@ namespace IxMilia.Classics
                 //   Y = Temp special code
                 //   Z = Sent by user, no dictionary reference
                 var match = _definitionMatcher.Match(line);
-                var entry = match.Groups[1].Value.Trim();
-                var pos = match.Groups[2].Value.Trim();
-                var flags = match.Groups[3].Value.Trim();
-                var definition = match.Groups[4].Value.Trim();
+                var entry = match.Groups[1].Value.Trim().Replace('_', ' ');
+                var pos = match.Groups[2].Value.Trim().Replace('_', ' ');
+                var flags = match.Groups[3].Value.Trim().Replace('_', ' ');
+                var definition = match.Groups[4].Value.Trim().Trim(';').Replace('_', ' ');
 
                 var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
                 if (dictEntry != null)
