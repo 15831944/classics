@@ -18,12 +18,12 @@
         <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
         <TestAssembly>$(SolutionDir)\Binaries\$(Configuration)\IxMilia.Classics.Test.dll</TestAssembly>
         <NuGetExe>$(MSBuildThisFileDirectory)src\.nuget\NuGet.exe</NuGetExe>
-        <PdfLatexExe>pdflatex</PdfLatexExe>
-        <MakeIndexExe>makeindex</MakeIndexExe>
+        <MakePdf>make-pdf.bat</MakePdf>
     </PropertyGroup>
 
     <ItemGroup>
         <LaTeXFiles Include="$(LaTeXPath)\Aeneid.tex" />
+        <LaTeXFiles Include="$(LaTeXPath)\make-pdf.bat" />
     </ItemGroup>
 
     <ItemGroup>
@@ -67,11 +67,7 @@
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
                      OutputPath="$(ResultPath)"
                      MaxLines="40" />
-        <Exec Command="$(PdfLatexExe) Aeneid.tex" WorkingDirectory="$(ResultPath)" IgnoreExitCode="true" />
-        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.gls Aeneid.glo" WorkingDirectory="$(ResultPath)" />
-        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.common-gls Aeneid.common-glo" WorkingDirectory="$(ResultPath)" />
-        <Exec Command="$(MakeIndexExe) -s Aeneid.ist -o Aeneid.uncommon-gls Aeneid.uncommon-glo" WorkingDirectory="$(ResultPath)" />
-        <Exec Command="$(PdfLatexExe) Aeneid.tex" WorkingDirectory="$(ResultPath)" />
+        <Exec Command="$(MakePdf)" WorkingDirectory="$(ResultPath)" />
     </Target>
 
     <Target Name="Test" DependsOnTargets="Build">
