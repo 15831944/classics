@@ -54,41 +54,30 @@ namespace IxMilia.Classics.BuildTasks
                 switch (element.Name.LocalName)
                 {
                     case "milestone":
+                        content.AppendLine(@"\indent");
                         break;
                     case "l":
                         content.Append(@"\lline{");
-                        var words = BreakLineIntoWords(element.Value); // TODO: don't drop punctuation
-                        foreach (var word in words)
+                        var wb = new StringBuilder();
+                        foreach (var c in element.Value)
                         {
-                            var matchedForms = latin.GetDefinitions(word).ToArray();
-                            bool defined = false;
-                            if (matchedForms.Length == 0)
+                            if (char.IsLetter(c))
                             {
-                                _undefinedWords++;
-                                Log.LogError($"Unable to define {word} on line {_currentLine}.");
+                                wb.Append(c);
                             }
                             else
                             {
-                                _definedWords++;
-                                if (matchedForms.Count() == 1)
-                                {
-                                    // assume all words are uncommon for now
-                                    var form = matchedForms.Single().Key;
-                                    content.Append($@"\uncom[{form.EntryKey}]{{{word}}} ");
-                                    defined = true;
-                                }
-
-                                foreach (var matchedForm in matchedForms)
-                                {
-                                    uncommonWords[matchedForm.Key.EntryKey] = Tuple.Create(matchedForm.Key.Entry, matchedForm.Key.Definition);
-                                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {matchedForm.Key.Entry} - {matchedForm.Key.Definition}");
-                                }
+                                var word = wb.ToString();
+                                wb.Clear();
+                                DefineAndPrintWord(latin, content, uncommonWords, word);
+                                content.Append(c);
                             }
+                        }
 
-                            if (!defined)
-                            {
-                                content.Append(word + " ");
-                            }
+                        if (wb.Length > 0)
+                        {
+                            DefineAndPrintWord(latin, content, uncommonWords, wb.ToString());
+                            wb.Clear();
                         }
 
                         content.AppendLine("}");
@@ -109,6 +98,39 @@ namespace IxMilia.Classics.BuildTasks
             Log.LogMessage($"Defined {_definedWords} words with {_undefinedWords} undefined.  {_definedWords * 100.0 / (_definedWords + _undefinedWords)}% success rate.");
 
             return true;
+        }
+
+        private void DefineAndPrintWord(LatinDictionary latin, StringBuilder content, Dictionary<string, Tuple<string, string>> uncommonWords, string word)
+        {
+            var matchedForms = latin.GetDefinitions(word).ToArray();
+            bool defined = false;
+            if (matchedForms.Length == 0)
+            {
+                _undefinedWords++;
+                Log.LogError($"Unable to define {word} on line {_currentLine}.");
+            }
+            else
+            {
+                _definedWords++;
+                if (matchedForms.Count() == 1)
+                {
+                    // assume all words are uncommon for now
+                    var form = matchedForms.Single().Key;
+                    content.Append($@"\uncom[{form.EntryKey}]{{{word}}}");
+                    defined = true;
+                }
+
+                foreach (var matchedForm in matchedForms)
+                {
+                    uncommonWords[matchedForm.Key.EntryKey] = Tuple.Create(matchedForm.Key.Entry, matchedForm.Key.Definition);
+                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {matchedForm.Key.Entry} - {matchedForm.Key.Definition}");
+                }
+            }
+
+            if (!defined)
+            {
+                content.Append(word);
+            }
         }
 
         private void LoadFile()
