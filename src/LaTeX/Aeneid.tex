@@ -6,7 +6,9 @@
 \usepackage[switch,modulo]{lineno}
 \usepackage{xifthen}
 \usepackage{everypage}
+\usepackage[noreledmac]{eledmac}
 
+\foottwocolX{A}
 \interfootnotelinepenalty=10000
 
 \newglossary*{common}{Common Words}
@@ -26,7 +28,7 @@
     }{%
         \ifthenelse{\glsentrycurrcount{\glslabel} = 0}{%
             % this is the first time we've seen this word so add a footnote
-            #1\let\thefootnote\relax\footnote{\textbf{\glslabel} #2.}%
+            #1\let\thefootnoteA\relax\footnoteA{\textbf{\glslabel} #2}%
         }{%
             % this isn't the first time we've seen this word so just print it
             #1%
