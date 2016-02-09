@@ -6,9 +6,11 @@
 \usepackage[switch,modulo]{lineno}
 \usepackage{xifthen}
 \usepackage{everypage}
-\usepackage[noreledmac]{eledmac}
+\usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
 
-\foottwocolX{A}
+% use two-column footnotes and don't span pages
+\usepackage{dblfnote}
+\DFNalwaysdouble
 \interfootnotelinepenalty=10000
 
 \newglossary*{common}{Common Words}
@@ -28,7 +30,7 @@
     }{%
         \ifthenelse{\glsentrycurrcount{\glslabel} = 0}{%
             % this is the first time we've seen this word so add a footnote
-            #1\let\thefootnoteA\relax\footnoteA{\textbf{\glslabel} #2}%
+            #1\let\thefootnote\relax\footnote{\textbf{\glstext} #2}%
         }{%
             % this isn't the first time we've seen this word so just print it
             #1%
