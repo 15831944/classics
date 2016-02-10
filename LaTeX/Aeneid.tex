@@ -3,6 +3,7 @@
 \author{Virgil}
 \date{}
 \usepackage[nonumberlist,nogroupskip,toc]{glossaries}
+\usepackage{glossary-mcols}
 \usepackage[switch,modulo]{lineno}
 \usepackage{xifthen}
 \usepackage{everypage}
@@ -16,6 +17,8 @@
 \newglossary*{common}{Common Words}
 \newglossary*{uncommon}{Uncommon Words}
 \makeglossaries
+
+\setglossarystyle{mcolindex}
 
 % enable counting the words
 \glsenableentrycount
@@ -82,5 +85,6 @@
     Output \arabic{CurrentLine} lines.
 
     \printglossary[type=common]
+    \printglossary[type=uncommon]
 
 \end{document}

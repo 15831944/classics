@@ -7,6 +7,7 @@
 *.*-gls
 *.log
 *.pdf
+*.toc
 commonwords.tex
 uncommonwords.tex
 content.tex
