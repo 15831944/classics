@@ -30,7 +30,7 @@
     }{%
         \ifthenelse{\glsentrycurrcount{\glslabel} = 0}{%
             % this is the first time we've seen this word so add a footnote
-            #1\let\thefootnote\relax\footnote{\textbf{\glstext} #2}%
+            #1\let\thefootnote\relax\footnote{\textbf{\glslabel} #2}%
         }{%
             % this isn't the first time we've seen this word so just print it
             #1%
@@ -41,8 +41,8 @@
 \renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}{#2}{#3}{#4}}
 \renewcommand\glsdisplay[4]{\glossdisplay{#1}{#2}{#3}{#4}}
 
-\newcommand\newcommonterm[2]{\newglossaryentry{#1}{name=#1,description=#2,type=common}}
-\newcommand\newuncommonterm[2]{\newglossaryentry{#1}{name=#1,description=#2,type=uncommon}}
+\newcommand\newcommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=common}}
+\newcommand\newuncommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=uncommon}}
 
 % the \hspace{} command corrects the slight gap that's inserted for the missing footnote number
 \newcommand\fixfootnotegap{\hspace{-0.35mm}}

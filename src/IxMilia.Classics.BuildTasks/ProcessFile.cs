@@ -88,7 +88,7 @@ namespace IxMilia.Classics.BuildTasks
 
             System.IO.File.WriteAllText(Path.Combine(OutputPath, "content.tex"), content.ToString());
             System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), "");
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{kvp.Key}}}{{name={{{kvp.Value.Item1}}},description={{{kvp.Value.Item2}}}}}")));
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{kvp.Key}}}{{{kvp.Value.Item1}}}{{{kvp.Value.Item2}}}")));
 
             if (MaxLines > 0)
             {
