@@ -1,9 +1,12 @@
 *.aux
+*.ilg
+*.ist
 *.glo
 *.gls
 *.*-glo
 *.*-gls
 *.log
+*.pdf
 commonwords.tex
 uncommonwords.tex
 content.tex
