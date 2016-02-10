@@ -30,7 +30,7 @@
     }{%
         \ifthenelse{\glsentrycurrcount{\glslabel} = 0}{%
             % this is the first time we've seen this word so add a footnote
-            #1\let\thefootnote\relax\footnote{\textbf{\glslabel} #2}%
+            #1\let\thefootnote\relax\footnote{\textbf{\glsentryname{\glslabel}} #2}%
         }{%
             % this isn't the first time we've seen this word so just print it
             #1%
