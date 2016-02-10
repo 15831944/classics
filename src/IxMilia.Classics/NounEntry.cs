@@ -96,6 +96,53 @@ namespace IxMilia.Classics
                     }
                     break;
                 case Declension.Third:
+                    if (Gender == Gender.Neuter)
+                    {
+                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
+                        {
+                            {Case.Nominative, Number.Singluar, nominative},
+                            {Case.Accusative, Number.Singluar, nominative},
+                            {Case.Vocative, Number.Singluar, nominative}
+                        };
+
+                        // all the other forms
+                        yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
+                        {
+                            {Case.Genitive, Number.Singluar},
+                            {Case.Dative, Number.Singluar},
+                            {Case.Ablative, Number.Singluar},
+                            {Case.Nominative, Number.Plural},
+                            {Case.Genitive, Number.Plural},
+                            {Case.Dative, Number.Plural},
+                            {Case.Accusative, Number.Plural},
+                            {Case.Ablative, Number.Plural},
+                            {Case.Vocative, Number.Plural},
+                        };
+                    }
+                    else
+                    {
+                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
+                        {
+                            {Case.Nominative, Number.Singluar, nominative},
+                            {Case.Vocative, Number.Singluar, nominative}
+                        };
+
+                        // all the other forms
+                        yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
+                        {
+                            {Case.Genitive, Number.Singluar},
+                            {Case.Dative, Number.Singluar},
+                            {Case.Accusative, Number.Singluar},
+                            {Case.Ablative, Number.Singluar},
+                            {Case.Nominative, Number.Plural},
+                            {Case.Genitive, Number.Plural},
+                            {Case.Dative, Number.Plural},
+                            {Case.Accusative, Number.Plural},
+                            {Case.Ablative, Number.Plural},
+                            {Case.Vocative, Number.Plural},
+                        };
+                    }
+                    break;
                 case Declension.Fourth:
                 case Declension.Fifth:
                     break;

@@ -142,10 +142,10 @@ namespace IxMilia.Classics
                 //   Y = Temp special code
                 //   Z = Sent by user, no dictionary reference
                 var match = _definitionMatcher.Match(line);
-                var entry = match.Groups[1].Value.Trim().Replace('_', ' ');
-                var pos = match.Groups[2].Value.Trim().Replace('_', ' ');
-                var flags = match.Groups[3].Value.Trim().Replace('_', ' ');
-                var definition = match.Groups[4].Value.Trim().Trim(';').Replace('_', ' ');
+                var entry = EscapeString(match.Groups[1].Value.Trim());
+                var pos = EscapeString(match.Groups[2].Value.Trim());
+                var flags = EscapeString(match.Groups[3].Value.Trim());
+                var definition = EscapeString(match.Groups[4].Value.Trim().TrimEnd(';'));
 
                 var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
                 if (dictEntry != null)
@@ -153,6 +153,14 @@ namespace IxMilia.Classics
                     _entries.Add(dictEntry);
                 }
             }
+        }
+
+        private static string EscapeString(string str)
+        {
+            return str
+                .Replace('_', ' ')
+                .Replace("<", "\\textless")
+                .Replace(">", "\\textgreater");
         }
     }
 }
