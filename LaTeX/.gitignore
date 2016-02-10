@@ -1,0 +1,9 @@
+*.aux
+*.glo
+*.gls
+*.*-glo
+*.*-gls
+*.log
+commonwords.tex
+uncommonwords.tex
+content.tex

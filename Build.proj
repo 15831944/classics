@@ -10,9 +10,8 @@
 
     <PropertyGroup>
         <DownloadDir Condition="'$(DownloadDir)' == ''">$(MSBuildThisFileDirectory)Downloads</DownloadDir>
-        <ResultPath Condition="'$(ResultPath)' == ''">$(MSBuildThisFileDirectory)Output</ResultPath>
         <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
-        <LaTeXPath Condition="'$(LaTeXPath)' == ''">$(SourceDir)\LaTeX</LaTeXPath>
+        <LaTeXPath Condition="'$(LaTeXPath)' == ''">$(MSBuildThisFileDirectory)\LaTeX</LaTeXPath>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <SolutionDir>$(MSBuildThisFileDirectory)src</SolutionDir>
         <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
@@ -28,7 +27,6 @@
 
     <ItemGroup>
         <DirectoriesToClean Include="$(DownloadDir)" />
-        <DirectoriesToClean Include="$(ResultPath)" />
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
 
@@ -63,11 +61,10 @@
     </Target>
 
     <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
-        <Copy SourceFiles="@(LaTeXFiles)" DestinationFolder="$(ResultPath)" />
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
-                     OutputPath="$(ResultPath)"
+                     OutputPath="$(LaTeXPath)"
                      MaxLines="40" />
-        <Exec Command="$(MakePdf)" WorkingDirectory="$(ResultPath)" />
+        <Exec Command="$(MakePdf)" WorkingDirectory="$(LaTeXPath)" />
     </Target>
 
     <Target Name="Test" DependsOnTargets="Build">
