@@ -39,5 +39,11 @@ namespace IxMilia.Classics.Test
         {
             AssertNounType("vir", Declension.Second, Gender.Masculine);
         }
+
+        [Fact]
+        public void NounPartOfSpeechParseTest4()
+        {
+            AssertNounType("epos", Declension.Third, Gender.Neuter);
+        }
     }
 }

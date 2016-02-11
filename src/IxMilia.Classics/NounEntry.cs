@@ -162,7 +162,7 @@ namespace IxMilia.Classics
                 .Trim()
                 .Replace("(i)", "i"); // TODO:
 
-            if (genitive == "-") return string.Empty;
+            if (genitive == "-") return null;
             string suffix = string.Empty;
             switch (Declension)
             {

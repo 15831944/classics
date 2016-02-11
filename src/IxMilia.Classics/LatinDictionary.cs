@@ -32,7 +32,7 @@ namespace IxMilia.Classics
             var matches = new HashSet<WordForm>();
             foreach (var entry in _entries)
             {
-                foreach (var stem in entry.GetStems())
+                foreach (var stem in entry.GetStems().Where(e => e.StemPart != null))
                 {
                     if (word.StartsWith(stem.StemPart))
                     {

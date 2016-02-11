@@ -24,17 +24,23 @@ namespace IxMilia.Classics
         {
             foreach (var form in _formsToGenerate)
             {
+                WordForm wf = null;
                 switch (Declension)
                 {
                     case Declension.First:
-                        yield return GetFirstDeclensionForm(form.Item1, form.Item2);
+                        wf = GetFirstDeclensionForm(form.Item1, form.Item2);
                         break;
                     case Declension.Second:
-                        yield return GetSecondDeclensionForm(form.Item1, form.Item2);
+                        wf = GetSecondDeclensionForm(form.Item1, form.Item2);
                         break;
                     case Declension.Third:
-                        yield return GetThirdDeclensionForm(form.Item1, form.Item2);
+                        wf = GetThirdDeclensionForm(form.Item1, form.Item2);
                         break;
+                }
+
+                if (wf != null)
+                {
+                    yield return wf;
                 }
             }
         }
@@ -79,6 +85,11 @@ namespace IxMilia.Classics
                         suffix = "as";
                         break;
                 }
+            }
+
+            if (StemPart == null && number != Number.Singluar && (@case != Case.Nominative || @case != Case.Vocative))
+            {
+                return null;
             }
 
             return new NounForm(this, @case, number, suffix);
@@ -132,6 +143,11 @@ namespace IxMilia.Classics
                 }
             }
 
+            if (StemPart == null && number != Number.Singluar && (@case != Case.Nominative || @case != Case.Vocative))
+            {
+                return null;
+            }
+
             return new NounForm(this, @case, number, suffix);
         }
 
@@ -177,6 +193,11 @@ namespace IxMilia.Classics
                     default:
                         throw new InvalidOperationException("Should have been a specific form");
                 }
+            }
+
+            if (StemPart == null && number != Number.Singluar && (@case != Case.Nominative || @case != Case.Vocative))
+            {
+                return null;
             }
 
             return new NounForm(this, @case, number, suffix);
