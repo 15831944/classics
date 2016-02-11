@@ -126,7 +126,7 @@ namespace IxMilia.Classics
                 {
                     case Case.Nominative:
                     case Case.Vocative:
-                        suffix = "i";
+                        suffix = Gender == Gender.Masculine ? "i" : "a";
                         break;
                     case Case.Genitive:
                         suffix = "orum";
@@ -136,7 +136,7 @@ namespace IxMilia.Classics
                         suffix = "is";
                         break;
                     case Case.Accusative:
-                        suffix = "os";
+                        suffix = Gender == Gender.Masculine ? "os" : "a";
                         break;
                     default:
                         throw new InvalidOperationException("Should have been a specific form");
