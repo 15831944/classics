@@ -123,6 +123,10 @@ namespace IxMilia.Classics.BuildTasks
                     content.Append($@"\uncom[{form.EntryKey}]{{{word}}}");
                     defined = true;
                 }
+                else
+                {
+                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", matchedForms.Select(m => m.Key.Entry))}].");
+                }
 
                 foreach (var matchedForm in matchedForms)
                 {
