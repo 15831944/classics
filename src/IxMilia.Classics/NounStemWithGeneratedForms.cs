@@ -36,6 +36,9 @@ namespace IxMilia.Classics
                     case Declension.Third:
                         wf = GetThirdDeclensionForm(form.Item1, form.Item2);
                         break;
+                    case Declension.Fourth:
+                        wf = GetFourthDeclensionForm(form.Item1, form.Item2);
+                        break;
                 }
 
                 if (wf != null)
@@ -185,6 +188,63 @@ namespace IxMilia.Classics
                         break;
                     case Case.Genitive:
                         suffix = "um";
+                        break;
+                    case Case.Dative:
+                    case Case.Ablative:
+                        suffix = "ibus";
+                        break;
+                    default:
+                        throw new InvalidOperationException("Should have been a specific form");
+                }
+            }
+
+            if (StemPart == null && number != Number.Singluar && (@case != Case.Nominative || @case != Case.Vocative))
+            {
+                return null;
+            }
+
+            return new NounForm(this, @case, number, suffix);
+        }
+
+        private WordForm GetFourthDeclensionForm(Case @case, Number number)
+        {
+            var suffix = string.Empty;
+            if (number == Number.Singluar)
+            {
+                switch (@case)
+                {
+                    case Case.Genitive:
+                        suffix = "us";
+                        break;
+                    case Case.Dative:
+                        suffix = "ui";
+                        break;
+                    case Case.Ablative:
+                        suffix = "u";
+                        break;
+                    case Case.Accusative:
+                        suffix = "um";
+                        break;
+                    default:
+                        throw new InvalidOperationException("Should have been a specific form");
+                }
+
+                if (Gender == Gender.Neuter && @case != Case.Genitive)
+                {
+                    suffix = "u";
+                }
+            }
+            else
+            {
+                switch (@case)
+                {
+                    case Case.Nominative:
+                    case Case.Vocative:
+                    case Case.Accusative:
+                        suffix = Gender == Gender.Neuter ? "ua" : "us";
+                        break;
+                    case Case.Genitive:
+                        suffix = "uum";
                         break;
                     case Case.Dative:
                     case Case.Ablative:
