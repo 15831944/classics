@@ -67,9 +67,13 @@ namespace IxMilia.Classics.BuildTasks
                             }
                             else
                             {
-                                var word = wb.ToString();
-                                wb.Clear();
-                                DefineAndPrintWord(latin, content, uncommonWords, word);
+                                if (wb.Length > 0)
+                                {
+                                    var word = wb.ToString();
+                                    wb.Clear();
+                                    DefineAndPrintWord(latin, content, uncommonWords, word);
+                                }
+
                                 content.Append(c);
                             }
                         }
