@@ -32,6 +32,8 @@ namespace IxMilia.Classics
             {
                 case "N":
                     return NounEntry.TryParse(entry, pos, flags, definition);
+                case "V":
+                    return VerbEntry.TryParse(entry, pos, flags, definition);
                 default:
                     return new UnsupportedEntry(entry, pos, flags, definition);
             }

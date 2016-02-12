@@ -22,6 +22,12 @@ namespace IxMilia.Classics.Test
             Assert.Equal(gender, entry.Gender);
         }
 
+        private void AssertVerbType(string word, Conjugation conjugation)
+        {
+            var entry = (VerbEntry)GetSingleEntry(word).Key;
+            Assert.Equal(conjugation, entry.Conjugation);
+        }
+
         [Fact]
         public void NounPartOfSpeechParseTest1()
         {
@@ -50,6 +56,18 @@ namespace IxMilia.Classics.Test
         public void NounMatchesMultipleStemsButOnlyOneFormTest()
         {
             AssertNounType("arma", Declension.Second, Gender.Neuter);
+        }
+
+        [Fact]
+        public void VerbConjugationTest1()
+        {
+            AssertVerbType("laudo", Conjugation.First);
+        }
+
+        [Fact]
+        public void VerbConjugationTest2()
+        {
+            AssertVerbType("laudat", Conjugation.First);
         }
     }
 }

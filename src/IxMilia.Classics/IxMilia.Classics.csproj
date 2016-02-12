@@ -19,7 +19,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
   <ItemGroup>
+    <Compile Include="Mood.cs" />
     <Compile Include="Case.cs" />
+    <Compile Include="Conjugation.cs" />
     <Compile Include="Declension.cs" />
     <Compile Include="DictionaryEntry.cs" />
     <Compile Include="Extensions.cs" />
@@ -28,7 +30,15 @@
     <Compile Include="NounForm.cs" />
     <Compile Include="NounStemWithGeneratedForms.cs" />
     <Compile Include="NounStemWithSpecificForms.cs" />
+    <Compile Include="Person.cs" />
+    <Compile Include="Tense.cs" />
     <Compile Include="UnsupportedEntry.cs" />
+    <Compile Include="VerbEntry.cs" />
+    <Compile Include="VerbForm.cs" />
+    <Compile Include="VerbStem.cs" />
+    <Compile Include="VerbStemWithGeneratedForms.cs" />
+    <Compile Include="VerbStemWithSpecificForms.cs" />
+    <Compile Include="Voice.cs" />
     <Compile Include="WordForm.cs" />
     <Compile Include="LatinDictionary.cs" />
     <Compile Include="NounStem.cs" />
