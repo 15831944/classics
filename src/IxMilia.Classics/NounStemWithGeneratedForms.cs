@@ -39,6 +39,9 @@ namespace IxMilia.Classics
                     case Declension.Fourth:
                         wf = GetFourthDeclensionForm(form.Item1, form.Item2);
                         break;
+                    case Declension.Fifth:
+                        wf = GetFifthDeclensionForm(form.Item1, form.Item2);
+                        break;
                 }
 
                 if (wf != null)
@@ -249,6 +252,56 @@ namespace IxMilia.Classics
                     case Case.Dative:
                     case Case.Ablative:
                         suffix = "ibus";
+                        break;
+                    default:
+                        throw new InvalidOperationException("Should have been a specific form");
+                }
+            }
+
+            if (StemPart == null && number != Number.Singluar && (@case != Case.Nominative || @case != Case.Vocative))
+            {
+                return null;
+            }
+
+            return new NounForm(this, @case, number, suffix);
+        }
+
+        private WordForm GetFifthDeclensionForm(Case @case, Number number)
+        {
+            var suffix = string.Empty;
+            if (number == Number.Singluar)
+            {
+                switch (@case)
+                {
+                    case Case.Genitive:
+                    case Case.Dative:
+                        suffix = "ei";
+                        break;
+                    case Case.Ablative:
+                        suffix = "e";
+                        break;
+                    case Case.Accusative:
+                        suffix = "em";
+                        break;
+                    default:
+                        throw new InvalidOperationException("Should have been a specific form");
+                }
+            }
+            else
+            {
+                switch (@case)
+                {
+                    case Case.Nominative:
+                    case Case.Vocative:
+                    case Case.Accusative:
+                        suffix = "es";
+                        break;
+                    case Case.Genitive:
+                        suffix = "erum";
+                        break;
+                    case Case.Dative:
+                    case Case.Ablative:
+                        suffix = "ebus";
                         break;
                     default:
                         throw new InvalidOperationException("Should have been a specific form");
