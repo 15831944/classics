@@ -69,8 +69,15 @@ that occur more than 10 times will also have an asterisk (*).
 Ideally this repo will never directly contain the classics texts or the
 dictionaries, but will instead be able to fetch them from online resources.
 
+### Requirements
+
+- [Visual Studio 2015](https://www.visualstudio.com/) (Community edition should suffice.)
+- LaTeX (I'm using the [MiKTeX](http://miktex.org/) version.)
+
 ### Usage
 
 ``` bash
 msbuild Build.proj
 ```
+
+`LaTeX\Aeneid.pdf` is the final output.
