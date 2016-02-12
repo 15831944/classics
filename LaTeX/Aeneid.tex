@@ -5,7 +5,6 @@
 \usepackage[nonumberlist,nogroupskip,toc]{glossaries}
 \usepackage{glossary-mcols}
 \usepackage[switch,modulo]{lineno}
-\usepackage{xifthen}
 \usepackage{everypage}
 \usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
 
@@ -27,18 +26,13 @@
 \AddEverypageHook{\glsresetall[uncommon]}
 
 \newcommand\glossdisplay[4]{%
-    \ifthenelse{\equal{\glstype}{common}}{%
-        % common words just get printed
-        #1%
-    }{%
-        \ifthenelse{\glsentrycurrcount{\glslabel} = 0}{%
-            % this is the first time we've seen this word so add a footnote
-            #1\let\thefootnote\relax\footnote{\textbf{\glsentryname{\glslabel}} #2}%
-        }{%
-            % this isn't the first time we've seen this word so just print it
-            #1%
-        }%
-    }%
+    % always print the word
+    #1%
+    \ifnum\pdfstrcmp{\glstype}{uncommon} = 0% only print uncommon nouns
+        \ifnum\glsentrycurrcount{\glslabel} = 0% and only the first time we've seen them
+            \let\thefootnote\relax\footnote{\textbf{\glsentryname{\glslabel}} #2}%
+        \fi
+    \fi
 }
 
 \renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}{#2}{#3}{#4}}
