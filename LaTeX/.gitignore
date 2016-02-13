@@ -8,6 +8,8 @@
 *.log
 *.pdf
 *.toc
+*.ppo
+*.ppg
 commonwords.tex
 uncommonwords.tex
 content.tex

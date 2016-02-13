@@ -58,6 +58,10 @@
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Build" />
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.ReorderFootnotes\IxMilia.Classics.ReorderFootnotes.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Build" />
     </Target>
 
     <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
@@ -79,6 +83,10 @@
         <RemoveDir Directories="@(DirectoriesToClean)" />
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics\IxMilia.Classics.csproj"
+                 Properties="TreatWarningsAsErrors=true"
+                 Targets="Clean" />
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.ReorderFootnotes\IxMilia.Classics.ReorderFootnotes.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Clean" />
         <MSBuild BuildInParallel="true"

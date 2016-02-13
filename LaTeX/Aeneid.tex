@@ -2,7 +2,7 @@
 \title{The Aeneid}
 \author{Virgil}
 \date{}
-\usepackage[nonumberlist,nogroupskip,toc]{glossaries}
+\usepackage[nonumberlist,nogroupskip,nopostdot,toc]{glossaries}
 \usepackage{glossary-mcols}
 \usepackage[switch,modulo]{lineno}
 \usepackage{everypage}
@@ -11,7 +11,7 @@
 % use two-column footnotes
 \usepackage{dblfnote}
 \DFNalwaysdouble
-\interfootnotelinepenalty=10000
+%\interfootnotelinepenalty=10000
 
 \newglossary*{common}{Common Words}
 \newglossary*{uncommon}{Uncommon Words}
@@ -25,18 +25,53 @@
 % reset uncommon word counters on each page to enable footnotes
 \AddEverypageHook{\glsresetall[uncommon]}
 
+\def\perpageorderfilename{\jobname.ppo}
+\def\perpageglossaryfilename{\jobname.ppg}
+
+% track glossary entry footnote order and pagebreaks
+\newcounter{IsFirstRun}
+\IfFileExists{\perpageglossaryfilename}{}{\setcounter{IsFirstRun}{1}}
+
+% only create output files on the first run
+\ifnum\theIsFirstRun = 1%
+    \newwrite\perpageorder
+    \immediate\openout\perpageorder=\perpageorderfilename
+    \AddEverypageHook{\write\perpageglossary{PAGE=\thepage}}
+    \newwrite\perpageglossary
+    \immediate\openout\perpageglossary=\perpageglossaryfilename
+\fi
+
+\newcommand\ftgls[1]{\let\thefootnote\relax\footnote{\textbf{\glsentryname{#1}} \glsentrydesc{#1}}}
+
 \newcommand\glossdisplay[4]{%
     % always print the word
-    #1%
+    \textit{#1}%
     \ifnum\pdfstrcmp{\glstype}{uncommon} = 0% only print uncommon nouns
         \ifnum\glsentrycurrcount{\glslabel} = 0% and only the first time we've seen them
-            \let\thefootnote\relax\footnote{\textbf{\glsentryname{\glslabel}} #2}%
+            \ftgls{\glslabel}% add an unordered footnote
+            \write\perpageglossary{WORD}% record that a word was added as a footnote
+            \immediate\write\perpageorder{\glslabel}% record the order of the footnote glosses
         \fi
     \fi
 }
 
-\renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}{#2}{#3}{#4}}
-\renewcommand\glsdisplay[4]{\glossdisplay{#1}{#2}{#3}{#4}}
+\ifnum\theIsFirstRun = 1%
+    \renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}{#2}{#3}{#4}}
+    \renewcommand\glsdisplay[4]{\glossdisplay{#1}{#2}{#3}{#4}}
+\fi
+
+%on the second run output the sorted per-page glossary
+\ifnum\theIsFirstRun = 0%
+    \endlinechar=256% suppress the final <return> of \read
+    \newread\perpageorder
+    \openin\perpageorder=\perpageorderfilename
+    \renewcommand\glsdisplayfirst[4]{%
+        \textit{#1}% display the text and output the ordered footnote
+        \read\perpageorder to \key%
+        \ftgls{\key}
+    }
+    \renewcommand\glsdisplay[4]{#1} % just display the text
+\fi
 
 \newcommand\newcommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=common}}
 \newcommand\newuncommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=uncommon}}
@@ -82,3 +117,13 @@
     \printglossary[type=uncommon]
 
 \end{document}
+
+% only save files on the first run
+\ifnum\theIsFirstRun = 1%
+    \immediate\closeout\perpageglossary
+    \immediate\closeout\perpageorder
+\fi
+
+\ifnum\theIsFirstRun = 0%
+    \closein\perpageorder
+\fi

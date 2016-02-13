@@ -5,3 +5,4 @@ obj/
 Output/
 packages/
 NuGet.exe
+*.user
