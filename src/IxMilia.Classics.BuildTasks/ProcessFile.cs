@@ -99,8 +99,8 @@ namespace IxMilia.Classics.BuildTasks
             var uncommonWords = ordered.Skip(CommonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
 
             System.IO.File.WriteAllText(Path.Combine(OutputPath, "content.tex"), content.ToString());
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{kvp.Key}}}{{{kvp.Value.Item1}}}{{{kvp.Value.Item2}}}")));
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{kvp.Key}}}{{{kvp.Value.Item1}}}{{{kvp.Value.Item2}}}")));
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
 
             if (MaxLines > 0)
             {
@@ -116,16 +116,55 @@ namespace IxMilia.Classics.BuildTasks
         {
             switch (c)
             {
-                case '\u201C': // double left quote
+                case '_':
+                    sb.Append(' ');
+                    break;
+                case '<':
+                    sb.Append(@"\textless ");
+                    break;
+                case '>':
+                    sb.Append(@"\textgreater ");
+                    break;
+                case '\\':
+                    sb.Append(@"\textbackslash ");
+                    break;
+                case '%':
+                case '{':
+                case '}':
+                    sb.Append('\\');
+                    sb.Append(c);
+                    break;
+                case '\u201C': // left double quote
                     sb.Append("``");
                     break;
-                case '\u201D': // double right quote
+                case '\u201D': // right double quote
                     sb.Append("''");
                     break;
                 default:
                     sb.Append(c);
                     break;
             }
+        }
+
+        private static string EscapeString(string str)
+        {
+            var sb = new StringBuilder();
+            var seenStartQuote = false;
+            foreach (var c in str)
+            {
+                switch (c)
+                {
+                    case '"':
+                        sb.Append(seenStartQuote ? "''" : "``");
+                        seenStartQuote = !seenStartQuote;
+                        break;
+                    default:
+                        AppendCharacter(sb, c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
 
         private void DefineAndPrintWord(LatinDictionary latin, StringBuilder content, Dictionary<string, Tuple<int, string, string>> definedWords, string word)
@@ -142,7 +181,7 @@ namespace IxMilia.Classics.BuildTasks
                     _definedWords++;
                     defined = true;
                     var form = matchedForms.Single().Key;
-                    content.Append($@"\agls{{{form.EntryKey}}}{{{word}}}");
+                    content.Append($@"\agls{{{EscapeString(form.EntryKey)}}}{{{EscapeString(word)}}}");
                     if (definedWords.ContainsKey(form.EntryKey))
                     {
                         var tuple = definedWords[form.EntryKey];
@@ -163,7 +202,7 @@ namespace IxMilia.Classics.BuildTasks
 
             if (!defined)
             {
-                content.Append(word);
+                content.Append(EscapeString(word));
             }
         }
 

@@ -143,10 +143,10 @@ namespace IxMilia.Classics
                 //   Y = Temp special code
                 //   Z = Sent by user, no dictionary reference
                 var match = _definitionMatcher.Match(line);
-                var entry = EscapeString(match.Groups[1].Value.Trim());
-                var pos = EscapeString(match.Groups[2].Value.Trim());
-                var flags = EscapeString(match.Groups[3].Value.Trim());
-                var definition = EscapeString(match.Groups[4].Value.Trim().TrimEnd(';'));
+                var entry = match.Groups[1].Value.Trim();
+                var pos = match.Groups[2].Value.Trim();
+                var flags = match.Groups[3].Value.Trim();
+                var definition = match.Groups[4].Value.Trim().TrimEnd(';');
 
                 var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
                 if (dictEntry != null)
@@ -154,51 +154,6 @@ namespace IxMilia.Classics
                     _entries.Add(dictEntry);
                 }
             }
-        }
-
-        private static string EscapeString(string str)
-        {
-            var sb = new StringBuilder();
-            var seenStartQuote = false;
-            foreach (var c in str)
-            {
-                switch (c)
-                {
-                    case '_':
-                        sb.Append(' ');
-                        break;
-                    case '<':
-                        sb.Append(@"\textless ");
-                        break;
-                    case '>':
-                        sb.Append(@"\textgreater ");
-                        break;
-                    case '\\':
-                        sb.Append(@"\textbackslash ");
-                        break;
-                    case '%':
-                    case '{':
-                    case '}':
-                        sb.Append('\\');
-                        sb.Append(c);
-                        break;
-                    case '"':
-                        sb.Append(seenStartQuote ? "''" : "``");
-                        seenStartQuote = !seenStartQuote;
-                        break;
-                    case '\u201C': // left double quote
-                        sb.Append("``");
-                        break;
-                    case '\u201D': // right double quote
-                        sb.Append("''");
-                        break;
-                    default:
-                        sb.Append(c);
-                        break;
-                }
-            }
-
-            return sb.ToString();
         }
     }
 }
