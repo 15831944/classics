@@ -1,3 +1,4 @@
+del Aeneid.aux
 del Aeneid.pdf
 del Aeneid.ppo
 del Aeneid.ppg

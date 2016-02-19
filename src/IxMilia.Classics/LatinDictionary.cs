@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace IxMilia.Classics
@@ -157,10 +158,47 @@ namespace IxMilia.Classics
 
         private static string EscapeString(string str)
         {
-            return str
-                .Replace('_', ' ')
-                .Replace("<", "\\textless")
-                .Replace(">", "\\textgreater");
+            var sb = new StringBuilder();
+            var seenStartQuote = false;
+            foreach (var c in str)
+            {
+                switch (c)
+                {
+                    case '_':
+                        sb.Append(' ');
+                        break;
+                    case '<':
+                        sb.Append(@"\textless ");
+                        break;
+                    case '>':
+                        sb.Append(@"\textgreater ");
+                        break;
+                    case '\\':
+                        sb.Append(@"\textbackslash ");
+                        break;
+                    case '%':
+                    case '{':
+                    case '}':
+                        sb.Append('\\');
+                        sb.Append(c);
+                        break;
+                    case '"':
+                        sb.Append(seenStartQuote ? "''" : "``");
+                        seenStartQuote = !seenStartQuote;
+                        break;
+                    case '\u201C': // left double quote
+                        sb.Append("``");
+                        break;
+                    case '\u201D': // right double quote
+                        sb.Append("''");
+                        break;
+                    default:
+                        sb.Append(c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

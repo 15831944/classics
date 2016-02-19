@@ -7,6 +7,7 @@
 \usepackage[switch,modulo]{lineno}
 \usepackage{everypage}
 \usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
+\usepackage{multicol}
 
 % use two-column footnotes
 \usepackage{dblfnote}
@@ -17,7 +18,26 @@
 \newglossary*{uncommon}{Uncommon Words}
 \makeglossaries
 
-\setglossarystyle{mcolindex}
+\newglossarystyle{mcolindex-noindent}{
+    \setglossarystyle{mcolindex}
+    \renewenvironment{theglossary}{%
+        \begin{multicols}{\glsmcols}
+        \setlength{\parindent}{0pt}
+        \setlength{\parskip}{0pt}
+        %\normalsize
+        %\small
+        \footnotesize
+        %\scriptsize
+        %\tiny
+        \raggedright
+    }{%
+        \end{multicols}
+    }
+    \renewcommand*{\glossentry}[2]{%
+        \textbf{\glossentryname{##1}} \glossentrydesc{##1}\linebreak%
+    }
+}
+\setglossarystyle{mcolindex-noindent}
 
 % enable counting the words
 \glsenableentrycount
@@ -41,47 +61,47 @@
     \immediate\openout\perpageglossary=\perpageglossaryfilename
 \fi
 
-\newcommand\ftgls[1]{\let\thefootnote\relax\footnote{\textbf{\glsentryname{#1}} \glsentrydesc{#1}}}
-
-\newcommand\glossdisplay[4]{%
-    % always print the word
-    \textit{#1}%
-    \ifnum\pdfstrcmp{\glstype}{uncommon} = 0% only print uncommon nouns
-        \ifnum\glsentrycurrcount{\glslabel} = 0% and only the first time we've seen them
-            \ftgls{\glslabel}% add an unordered footnote
-            \write\perpageglossary{WORD}% record that a word was added as a footnote
-            \immediate\write\perpageorder{\glslabel}% record the order of the footnote glosses
-        \fi
-    \fi
-}
+% the \hspace{} command corrects the slight gap that's inserted for the missing footnote number
+\newcommand\fixfootnotegap{\hspace{-0.35mm}}
+\newcommand\ftgls[1]{\let\thefootnote\relax\footnote{\textbf{\glsentryname{#1}} \glsentrydesc{#1}}\fixfootnotegap}
 
 \ifnum\theIsFirstRun = 1%
-    \renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}{#2}{#3}{#4}}
-    \renewcommand\glsdisplay[4]{\glossdisplay{#1}{#2}{#3}{#4}}
+    \newcommand\glossdisplayuncommonword{%
+        \ftgls{\glslabel}% add an unordered footnote
+        \write\perpageglossary{WORD}% record that a word was added as a footnote
+        \immediate\write\perpageorder{\glslabel}% record the order of the footnote glosses
+    }%
+\else%
+    \endlinechar=256 % suppress the final <return> of \read
+    \newread\perpageorder%
+    \openin\perpageorder=\perpageorderfilename%
+    \newcommand\glossdisplayuncommonword{%
+        \read\perpageorder to \key% read the ordered footnote key
+        \ftgls{\key}% add the footnote
+    }%
 \fi
 
-%on the second run output the sorted per-page glossary
-\ifnum\theIsFirstRun = 0%
-    \endlinechar=256% suppress the final <return> of \read
-    \newread\perpageorder
-    \openin\perpageorder=\perpageorderfilename
-    \renewcommand\glsdisplayfirst[4]{%
-        \textit{#1}% display the text and output the ordered footnote
-        \read\perpageorder to \key%
-        \ftgls{\key}
-    }
-    \renewcommand\glsdisplay[4]{#1} % just display the text
-\fi
+\newcommand\glossdisplay[1]{%
+    \ifnum\pdfstrcmp{\glstype}{uncommon} = 0%
+        #1% uncommon words get printed normally
+        \ifnum\glsentrycurrcount{#1} = 0% only execute the first time we see this word on the page
+            \glossdisplayuncommonword%
+        \fi%
+    \else%
+        \textit{#1}% common words are italicized
+    \fi%
+}
+
+\renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}}
+\renewcommand\glsdisplay[4]{\glossdisplay{#1}}
 
 \newcommand\newcommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=common}}
 \newcommand\newuncommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=uncommon}}
 
-% the \hspace{} command corrects the slight gap that's inserted for the missing footnote number
-\newcommand\fixfootnotegap{\hspace{-0.35mm}}
-\newcommand\com[2][\relax]{\textit{\glsdisp{#1}{#2}}\fixfootnotegap}
-\newcommand\uncom[2][\relax]{\glsdisp{#1}{#2}\fixfootnotegap}
+\newcommand\agls[2]{\glsdisp{#1}{#2}}
 
 \newcommand\newchapter[1]{%
+    \indent
     %\chapter*{#1}
     %\cleardoublepage
     %\phantomsection
@@ -106,24 +126,23 @@
     %TODO: introduction
 
     \begin{linenumbers}
-    \begin{flushleft}
-        \input{content.tex}
-    \end{flushleft}
-    \end{linenumbers}
+        \raggedright
+        \setlength{\parindent}{1em}
 
-    Output \arabic{CurrentLine} lines.
+        % TODO: unset this for the footnotes
+        %\setlength{\hoffset}{1in}
+        \input{content.tex}
+    \end{linenumbers}
 
     \printglossary[type=common]
     \printglossary[type=uncommon]
 
 \end{document}
 
-% only save files on the first run
 \ifnum\theIsFirstRun = 1%
+    % only save files on the first run
     \immediate\closeout\perpageglossary
     \immediate\closeout\perpageorder
-\fi
-
-\ifnum\theIsFirstRun = 0%
+\else
     \closein\perpageorder
 \fi

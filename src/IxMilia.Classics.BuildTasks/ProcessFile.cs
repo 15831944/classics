@@ -22,6 +22,8 @@ namespace IxMilia.Classics.BuildTasks
 
         public int MaxLines { get; set; }
 
+        public int CommonWordCount { get; set; } = 250;
+
         private readonly Regex _wordMatcher = new Regex("[a-zA-Z]+", RegexOptions.Compiled);
 
         private int _bookNumber;
@@ -36,10 +38,11 @@ namespace IxMilia.Classics.BuildTasks
             var latin = new LatinDictionary();
 
             var content = new StringBuilder();
-            var uncommonWords = new Dictionary<string, Tuple<string, string>>();
+            var definedWords = new Dictionary<string, Tuple<int, string, string>>();
 
             content.AppendLine(@"\newchapter{Book 1}");
 
+            // define all words
             _currentLine = 1;
             _definedWords = 0;
             _undefinedWords = 0;
@@ -71,16 +74,16 @@ namespace IxMilia.Classics.BuildTasks
                                 {
                                     var word = wb.ToString();
                                     wb.Clear();
-                                    DefineAndPrintWord(latin, content, uncommonWords, word);
+                                    DefineAndPrintWord(latin, content, definedWords, word);
                                 }
 
-                                content.Append(c);
+                                AppendCharacter(content, c);
                             }
                         }
 
                         if (wb.Length > 0)
                         {
-                            DefineAndPrintWord(latin, content, uncommonWords, wb.ToString());
+                            DefineAndPrintWord(latin, content, definedWords, wb.ToString());
                             wb.Clear();
                         }
 
@@ -90,8 +93,13 @@ namespace IxMilia.Classics.BuildTasks
                 }
             }
 
+            // sort common/uncommon words
+            var ordered = definedWords.OrderByDescending(d => d.Value.Item1).ToList();
+            var commonWords = ordered.Take(CommonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
+            var uncommonWords = ordered.Skip(CommonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
+
             System.IO.File.WriteAllText(Path.Combine(OutputPath, "content.tex"), content.ToString());
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), "");
+            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{kvp.Key}}}{{{kvp.Value.Item1}}}{{{kvp.Value.Item2}}}")));
             System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{kvp.Key}}}{{{kvp.Value.Item1}}}{{{kvp.Value.Item2}}}")));
 
             if (MaxLines > 0)
@@ -104,35 +112,53 @@ namespace IxMilia.Classics.BuildTasks
             return true;
         }
 
-        private void DefineAndPrintWord(LatinDictionary latin, StringBuilder content, Dictionary<string, Tuple<string, string>> uncommonWords, string word)
+        private static void AppendCharacter(StringBuilder sb, char c)
+        {
+            switch (c)
+            {
+                case '\u201C': // double left quote
+                    sb.Append("``");
+                    break;
+                case '\u201D': // double right quote
+                    sb.Append("''");
+                    break;
+                default:
+                    sb.Append(c);
+                    break;
+            }
+        }
+
+        private void DefineAndPrintWord(LatinDictionary latin, StringBuilder content, Dictionary<string, Tuple<int, string, string>> definedWords, string word)
         {
             var matchedForms = latin.GetDefinitions(word).ToArray();
             bool defined = false;
-            if (matchedForms.Length == 0)
+            switch (matchedForms.Length)
             {
-                _undefinedWords++;
-                Log.LogError($"Unable to define {word} on line {_currentLine}.");
-            }
-            else
-            {
-                _definedWords++;
-                if (matchedForms.Count() == 1)
-                {
-                    // assume all words are uncommon for now
-                    var form = matchedForms.Single().Key;
-                    content.Append($@"\uncom[{form.EntryKey}]{{{word}}}");
+                case 0:
+                    _undefinedWords++;
+                    Log.LogError($"Unable to define {word} on line {_currentLine}.");
+                    break;
+                case 1:
+                    _definedWords++;
                     defined = true;
-                }
-                else
-                {
-                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", matchedForms.Select(m => m.Key.Entry))}].");
-                }
+                    var form = matchedForms.Single().Key;
+                    content.Append($@"\agls{{{form.EntryKey}}}{{{word}}}");
+                    if (definedWords.ContainsKey(form.EntryKey))
+                    {
+                        var tuple = definedWords[form.EntryKey];
+                        definedWords[form.EntryKey] = Tuple.Create(tuple.Item1 + 1, tuple.Item2, tuple.Item3);
+                    }
+                    else
+                    {
+                        definedWords[form.EntryKey] = Tuple.Create(1, form.Entry, form.Definition);
+                    }
 
-                foreach (var matchedForm in matchedForms)
-                {
-                    uncommonWords[matchedForm.Key.EntryKey] = Tuple.Create(matchedForm.Key.Entry, matchedForm.Key.Definition);
-                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {matchedForm.Key.Entry} - {matchedForm.Key.Definition}");
-                }
+                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {form.Entry} - {form.Definition}");
+                    break;
+                default:
+                    _undefinedWords++;
+                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", matchedForms.Select(m => m.Key.Entry))}].");
+                    break;
             }
 
             if (!defined)
