@@ -46,6 +46,7 @@ namespace IxMilia.Classics.BuildTasks
             _currentLine = 1;
             _definedWords = 0;
             _undefinedWords = 0;
+            var macro = "lline";
             foreach (var element in _elements)
             {
                 if (MaxLines > 0 && _currentLine > MaxLines)
@@ -57,10 +58,11 @@ namespace IxMilia.Classics.BuildTasks
                 switch (element.Name.LocalName)
                 {
                     case "milestone":
-                        content.AppendLine(@"\indent");
+                        macro = "pline";
                         break;
                     case "l":
-                        content.Append(@"\lline{");
+                        content.Append(@"\" + macro + "{");
+                        macro = "lline";
                         var wb = new StringBuilder();
                         foreach (var c in element.Value)
                         {

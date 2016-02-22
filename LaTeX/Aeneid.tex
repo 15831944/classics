@@ -101,7 +101,6 @@
 \newcommand\agls[2]{\glsdisp{#1}{#2}}
 
 \newcommand\newchapter[1]{%
-    \indent
     %\chapter*{#1}
     %\cleardoublepage
     %\phantomsection
@@ -109,7 +108,9 @@
 }
 
 \newcounter{CurrentLine}
-\newcommand\lline[1]{#1\stepcounter{CurrentLine}\linebreak}
+\newcommand\NewLine[1]{#1\stepcounter{CurrentLine}}
+\newcommand\lline[1]{\linebreak\NewLine{#1}}
+\newcommand\pline[1]{\par\NewLine{#1}}
 
 % common words
 \input{commonwords.tex}
