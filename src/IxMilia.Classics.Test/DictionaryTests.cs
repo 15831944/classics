@@ -28,6 +28,12 @@ namespace IxMilia.Classics.Test
             Assert.Equal(conjugation, entry.Conjugation);
         }
 
+        private void AssertConjuction(string word)
+        {
+            var entry = GetSingleEntry(word).Key;
+            Assert.Equal(PartOfSpeech.Conjunction, entry.PartOfSpeech);
+        }
+
         [Fact]
         public void NounPartOfSpeechParseTest1()
         {
@@ -68,6 +74,12 @@ namespace IxMilia.Classics.Test
         public void VerbConjugationTest2()
         {
             AssertVerbType("laudat", Conjugation.First);
+        }
+
+        [Fact]
+        public void ConjuectionTest1()
+        {
+            AssertConjuction("que");
         }
     }
 }

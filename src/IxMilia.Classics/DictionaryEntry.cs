@@ -30,6 +30,8 @@ namespace IxMilia.Classics
             var part = pos.Split(" ".ToCharArray()).FirstOrDefault();
             switch (part)
             {
+                case "CONJ":
+                    return new ConjuctionEntry(entry, definition, flags);
                 case "N":
                     return NounEntry.TryParse(entry, pos, flags, definition);
                 case "V":

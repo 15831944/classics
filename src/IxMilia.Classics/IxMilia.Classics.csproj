@@ -19,6 +19,9 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
   <ItemGroup>
+    <Compile Include="BasicStem.cs" />
+    <Compile Include="BasicWordForm.cs" />
+    <Compile Include="ConjuctionEntry.cs" />
     <Compile Include="Mood.cs" />
     <Compile Include="Case.cs" />
     <Compile Include="Conjugation.cs" />
