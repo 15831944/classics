@@ -1,14 +1,24 @@
 ﻿// Copyright (c) IxMilia.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace IxMilia.Classics
 {
+    public class DefinitionGroup
+    {
+        public IEnumerable<DefinitionPart> Parts { get; }
+
+        public DefinitionGroup(IEnumerable<DefinitionPart> parts)
+        {
+            Parts = parts;
+        }
+    }
+
     public class LatinDictionary
     {
         private readonly List<DictionaryEntry> _entries = new List<DictionaryEntry>();
@@ -25,31 +35,95 @@ namespace IxMilia.Classics
             LoadDictionary();
         }
 
-        public IEnumerable<IGrouping<DictionaryEntry, WordForm>> GetDefinitions(string word)
+        public IEnumerable<DefinitionGroup> GetDefinitions(string word)
         {
             word = word.ToLowerInvariant();
 
-            // TODO: n^3 linear search hurts my soul; precompute and cache stems in a trie
-            var matches = new HashSet<WordForm>();
-            foreach (var entry in _entries)
+            var definitions = new List<DefinitionGroup>();
+
+            var parts = GetDefinitionParts(word);
+            definitions.AddRange(parts.Select(part => new DefinitionGroup(new[] { part })));
+
+            // try `-ne` and `-que`
+            foreach (var enc in Enclitics)
             {
-                foreach (var stem in entry.GetStems().Where(e => e.StemPart != null))
+                if (word.EndsWith(enc))
                 {
-                    if (word.StartsWith(stem.StemPart))
+                    var baseWord = word.Substring(0, word.Length - enc.Length);
+                    var entry = GetEnclitic(enc);
+                    var encliticStem = entry.GetStems().Single();
+                    var encliticDefined = new DefinitionPart(encliticStem, new Span(baseWord.Length, enc.Length), entry.GetStems().SelectMany(s => s.GetForms()));
+                    var baseMatches = GetDefinitionParts(baseWord);
+                    foreach (var baseMatch in baseMatches)
                     {
-                        foreach (var form in stem.GetForms())
-                        {
-                            // TODO: handle suffix words like "ne" and "que"
-                            if (word == form.Stem.StemPart + form.Suffix)
-                            {
-                                matches.Add(form);
-                            }
-                        }
+                        definitions.Add(new DefinitionGroup(new[] { baseMatch, encliticDefined }));
                     }
                 }
             }
 
-            return matches.GroupBy(m => m.Stem.Entry);
+            return definitions;
+        }
+
+        private DictionaryEntry GetEnclitic(string enc)
+        {
+            switch (enc)
+            {
+                case "ne":
+                    return _neEnclitic;
+                case "que":
+                    return _queEnclitic;
+                default:
+                    throw new InvalidOperationException("Unexpected enclitic " + enc);
+            }
+        }
+
+        private readonly string[] Enclitics = new string[] { "ne", "que" };
+
+        private DictionaryEntry _neEnclitic;
+        private DictionaryEntry _queEnclitic;
+
+        private IEnumerable<DefinitionPart> GetDefinitionParts(string word)
+        {
+            // TODO: n^3 linear search hurts my soul; precompute and cache stems in a trie
+            var result = new List<DefinitionPart>();
+            foreach (var entry in _entries)
+            {
+                // cached `-ne` and `-que` enclitics for later use
+                if (entry.PartOfSpeech == PartOfSpeech.Conjunction)
+                {
+                    if (entry.Entry == "ne" && _neEnclitic == null)
+                    {
+                        _neEnclitic = entry;
+                    }
+                    else if (entry.Entry == "que" && _queEnclitic == null)
+                    {
+                        _queEnclitic = entry;
+                    }
+                }
+
+                foreach (var stem in entry.GetStems().Where(e => e.StemPart != null))
+                {
+                    var forms = new List<WordForm>();
+                    if (word.StartsWith(stem.StemPart))
+                    {
+                        foreach (var form in stem.GetForms())
+                        {
+                            if (word == form.Stem.StemPart + form.Suffix)
+                            {
+                                forms.Add(form);
+                            }
+                        }
+                    }
+
+                    if (forms.Count > 0)
+                    {
+                        var part = new DefinitionPart(stem, new Span(0, word.Length), forms);
+                        result.Add(part);
+                    }
+                }
+            }
+
+            return result;
         }
 
         private void LoadDictionary()

@@ -171,34 +171,38 @@ namespace IxMilia.Classics.BuildTasks
 
         private void DefineAndPrintWord(LatinDictionary latin, StringBuilder content, Dictionary<string, Tuple<int, string, string>> definedWords, string word)
         {
-            var matchedForms = latin.GetDefinitions(word).ToArray();
+            var definitionGroups = latin.GetDefinitions(word).ToArray();
             bool defined = false;
-            switch (matchedForms.Length)
+            switch (definitionGroups.Length)
             {
                 case 0:
                     _undefinedWords++;
                     Log.LogError($"Unable to define {word} on line {_currentLine}.");
                     break;
                 case 1:
-                    _definedWords++;
                     defined = true;
-                    var form = matchedForms.Single().Key;
-                    content.Append($@"\agls{{{EscapeString(form.EntryKey)}}}{{{EscapeString(word)}}}");
-                    if (definedWords.ContainsKey(form.EntryKey))
+                    foreach (var part in definitionGroups.Single().Parts)
                     {
-                        var tuple = definedWords[form.EntryKey];
-                        definedWords[form.EntryKey] = Tuple.Create(tuple.Item1 + 1, tuple.Item2, tuple.Item3);
-                    }
-                    else
-                    {
-                        definedWords[form.EntryKey] = Tuple.Create(1, form.Entry, form.Definition);
+                        _definedWords++;
+                        var entry = part.Stem.Entry;
+                        content.Append($@"\agls{{{EscapeString(entry.EntryKey)}}}{{{EscapeString(word.Substring(part.Span.Offset, part.Span.Length))}}}");
+                        if (definedWords.ContainsKey(entry.EntryKey))
+                        {
+                            var tuple = definedWords[entry.EntryKey];
+                            definedWords[entry.EntryKey] = Tuple.Create(tuple.Item1 + 1, tuple.Item2, tuple.Item3);
+                        }
+                        else
+                        {
+                            definedWords[entry.EntryKey] = Tuple.Create(1, entry.Entry, entry.Definition);
+                        }
+
+                        Console.WriteLine($"Found definition on line {_currentLine}: {word} = {entry.Entry} - {entry.Definition}");
                     }
 
-                    Console.WriteLine($"Found definition on line {_currentLine}: {word} = {form.Entry} - {form.Definition}");
                     break;
                 default:
                     _undefinedWords++;
-                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", matchedForms.Select(m => m.Key.Entry))}].");
+                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", definitionGroups.SelectMany(m => m.Parts.Select(fs => fs.Stem.Entry.Entry)))}].");
                     break;
             }
 

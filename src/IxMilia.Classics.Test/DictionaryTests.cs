@@ -9,28 +9,37 @@ namespace IxMilia.Classics.Test
     {
         static readonly LatinDictionary Latin = new LatinDictionary();
 
-        private IGrouping<DictionaryEntry, WordForm> GetSingleEntry(string word)
+        private DefinitionGroup GetSinglyDefinedWord(string word)
         {
             var definitions = Latin.GetDefinitions(word);
-            return definitions.Single();
+            var definitionGroup = definitions.Single();
+            var uniqueStems = definitionGroup.Parts.Select(part => part.Stem).Distinct();
+            Assert.Equal(1, uniqueStems.Count());
+            return definitionGroup;
+        }
+
+        private DictionaryEntry GetSinglyDefinedEntry(string word)
+        {
+            var definitionGroup = GetSinglyDefinedWord(word);
+            return definitionGroup.Parts.Single().Stem.Entry;
         }
 
         private void AssertNounType(string word, Declension declension, Gender gender)
         {
-            var entry = (NounEntry)GetSingleEntry(word).Key;
+            var entry = (NounEntry)GetSinglyDefinedEntry(word);
             Assert.Equal(declension, entry.Declension);
             Assert.Equal(gender, entry.Gender);
         }
 
         private void AssertVerbType(string word, Conjugation conjugation)
         {
-            var entry = (VerbEntry)GetSingleEntry(word).Key;
+            var entry = (VerbEntry)GetSinglyDefinedEntry(word);
             Assert.Equal(conjugation, entry.Conjugation);
         }
 
         private void AssertConjuction(string word)
         {
-            var entry = GetSingleEntry(word).Key;
+            var entry = GetSinglyDefinedEntry(word);
             Assert.Equal(PartOfSpeech.Conjunction, entry.PartOfSpeech);
         }
 
@@ -80,6 +89,15 @@ namespace IxMilia.Classics.Test
         public void ConjuectionTest1()
         {
             AssertConjuction("que");
+        }
+
+        [Fact]
+        public void EncliticTest()
+        {
+            var definition = Latin.GetDefinitions("armaque").Single();
+            Assert.Equal(2, definition.Parts.Count());
+            Assert.Equal("armum, armi", definition.Parts.First().Stem.Entry.Entry);
+            Assert.Equal("que", definition.Parts.Last().Stem.Entry.Entry);
         }
     }
 }
