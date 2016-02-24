@@ -9,16 +9,6 @@ using System.Text.RegularExpressions;
 
 namespace IxMilia.Classics
 {
-    public class DefinitionGroup
-    {
-        public IEnumerable<DefinitionPart> Parts { get; }
-
-        public DefinitionGroup(IEnumerable<DefinitionPart> parts)
-        {
-            Parts = parts;
-        }
-    }
-
     public class LatinDictionary
     {
         private readonly List<DictionaryEntry> _entries = new List<DictionaryEntry>();
