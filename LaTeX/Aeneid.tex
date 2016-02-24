@@ -83,7 +83,7 @@
 
 \newcommand\glossdisplay[1]{%
     \ifnum\pdfstrcmp{\glstype}{uncommon} = 0%
-        #1% uncommon words get printed normally
+        \underline{#1}% uncommon words get underlined; this will be removed in the final version
         \ifnum\glsentrycurrcount{#1} = 0% only execute the first time we see this word on the page
             \glossdisplayuncommonword%
         \fi%
