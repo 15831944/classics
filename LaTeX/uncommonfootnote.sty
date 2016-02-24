@@ -1,0 +1,88 @@
+\ProvidesPackage{uncommonfootnote}
+
+\RequirePackage{glossaries}
+\RequirePackage{everypage}
+
+% no options for now
+
+\ProcessOptions\relax
+
+\newglossary*{common}{Common Words}
+\newglossary*{uncommon}{Uncommon Words}
+\makeglossaries
+
+% enable counting the words
+\glsenableentrycount
+
+% reset uncommon word counters on each page to enable footnotes
+\AddEverypageHook{\glsresetall[uncommon]}
+
+\def\perpageorderfilename{\jobname.ppo}
+\def\perpageglossaryfilename{\jobname.ppg}
+
+% track glossary entry footnote order and pagebreaks
+\newcounter{IsFirstRun}
+\IfFileExists{\perpageglossaryfilename}{}{\setcounter{IsFirstRun}{1}}
+
+% only create output files on the first run
+\ifnum\theIsFirstRun = 1%
+    \newwrite\perpageorder
+    \immediate\openout\perpageorder=\perpageorderfilename
+    \AddEverypageHook{\write\perpageglossary{PAGE=\thepage}}
+    \newwrite\perpageglossary
+    \immediate\openout\perpageglossary=\perpageglossaryfilename
+\fi
+
+% the \hspace{} command corrects the slight gap that's inserted for the missing footnote number
+\newcommand\fixfootnotegap{\hspace{-0.35mm}}
+\newcommand\ftgls[1]{\let\thefootnote\relax\footnote{\textbf{\glsentryname{#1}} \glsentrydesc{#1}}\fixfootnotegap}
+
+\ifnum\theIsFirstRun = 1%
+    \newcommand\glossdisplayuncommonword{%
+        \ftgls{\glslabel}% add an unordered footnote
+        \write\perpageglossary{WORD}% record that a word was added as a footnote
+        \immediate\write\perpageorder{\glslabel}% record the order of the footnote glosses
+    }%
+\else%
+    \endlinechar=256 % suppress the final <return> of \read
+    \newread\perpageorder%
+    \openin\perpageorder=\perpageorderfilename%
+    \newcommand\glossdisplayuncommonword{%
+        \read\perpageorder to \key% read the ordered footnote key
+        \ftgls{\key}% add the footnote
+    }%
+\fi
+
+\newcommand\glossdisplay[1]{%
+    \ifnum\pdfstrcmp{\glstype}{uncommon} = 0%
+        \underline{#1}% uncommon words get underlined; this will be removed in the final version
+        \ifnum\glsentrycurrcount{#1} = 0% only execute the first time we see this word on the page
+            \glossdisplayuncommonword%
+        \fi%
+    \else%
+        \textit{#1}% common words are italicized
+    \fi%
+}
+
+\renewcommand\glsdisplayfirst[4]{\glossdisplay{#1}}
+\renewcommand\glsdisplay[4]{\glossdisplay{#1}}
+
+\newcommand\newcommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=common}}
+\newcommand\newuncommonterm[3]{\newglossaryentry{#1}{name={#2},description={#3},type=uncommon}}
+
+\newcommand\agls[2]{\glsdisp{#1}{#2}}
+
+\newcommand\printcommonglossary{\printglossary[type=common]}
+\newcommand\printuncommonglossary{\printglossary[type=uncommon]}
+
+\AtEndDocument{
+    \ifnum\theIsFirstRun = 1%
+        % only save files on the first run
+        \immediate\closeout\perpageglossary
+        \immediate\closeout\perpageorder
+    \else
+        \closein\perpageorder
+    \fi
+}
+
+\endinput
