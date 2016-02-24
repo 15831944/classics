@@ -42,15 +42,17 @@ namespace IxMilia.Classics
         private WordForm GetFirstConjugationForm(Person person, Number number, Mood mood, Voice voice, Tense tense)
         {
             var suffix = string.Empty;
-            if (person == Person.Second && number == Number.Singluar && mood == Mood.Indicative && voice == Voice.Active && tense == Tense.Present)
+            if (person == Person.First && number == Number.Singluar && mood == Mood.Indicative && voice == Voice.Active)
+                suffix = "m";
+            if (person == Person.Second && number == Number.Singluar && mood == Mood.Indicative && voice == Voice.Active)
                 suffix = "s";
-            if (person == Person.Third && number == Number.Singluar && mood == Mood.Indicative && voice == Voice.Active && tense == Tense.Present)
+            if (person == Person.Third && number == Number.Singluar && mood == Mood.Indicative && voice == Voice.Active)
                 suffix = "t";
-            if (person == Person.First && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active && tense == Tense.Present)
+            if (person == Person.First && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active)
                 suffix = "mus";
-            if (person == Person.Second && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active && tense == Tense.Present)
+            if (person == Person.Second && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active)
                 suffix = "tis";
-            if (person == Person.Third && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active && tense == Tense.Present)
+            if (person == Person.Third && number == Number.Plural && mood == Mood.Indicative && voice == Voice.Active)
                 suffix = "nt";
 
             return new VerbForm(this, Conjugation, person, number, mood, voice, tense, suffix);

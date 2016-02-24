@@ -98,7 +98,7 @@ namespace IxMilia.Classics
                     {
                         foreach (var form in stem.GetForms())
                         {
-                            if (word == form.Stem.StemPart + form.Suffix)
+                            if (word.Length == form.Stem.StemPart.Length + form.Suffix.Length && word.EndsWith(form.Suffix))
                             {
                                 forms.Add(form);
                             }

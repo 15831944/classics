@@ -45,6 +45,7 @@ namespace IxMilia.Classics
             var presentStem = GetPresentStem();
             if (presentStem != null)
             {
+                // present
                 yield return new VerbStemWithGeneratedForms(Conjugation, presentStem, this)
                 {
                     {Person.Second, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Present},
@@ -52,6 +53,31 @@ namespace IxMilia.Classics
                     {Person.First, Number.Plural, Mood.Indicative, Voice.Active, Tense.Present},
                     {Person.Second, Number.Plural, Mood.Indicative, Voice.Active, Tense.Present},
                     {Person.Third, Number.Plural, Mood.Indicative, Voice.Active, Tense.Present},
+                };
+
+                // imperfect
+                yield return new VerbStemWithGeneratedForms(Conjugation, presentStem + "ba", this)
+                {
+                    {Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Second, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Third, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.First, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Second, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Third, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                };
+
+                // future
+                yield return new VerbStemWithSpecificForms(Conjugation, this)
+                {
+                    {Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bo"},
+                    {Conjugation, Person.Third, Number.Plural, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bunt"},
+                };
+                yield return new VerbStemWithGeneratedForms(Conjugation, presentStem + "bi", this)
+                {
+                    {Person.Second, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Third, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.First, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
+                    {Person.Second, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
                 };
             }
         }
