@@ -21,7 +21,7 @@
 \newglossarystyle{mcolindex-noindent}{
     \setglossarystyle{mcolindex}
     \renewenvironment{theglossary}{%
-        \begin{multicols}{\glsmcols}
+        \begin{multicols*}{\glsmcols}
         \setlength{\parindent}{0pt}
         \setlength{\parskip}{0pt}
         %\normalsize
@@ -31,10 +31,10 @@
         %\tiny
         \raggedright
     }{%
-        \end{multicols}
+        \end{multicols*}
     }
     \renewcommand*{\glossentry}[2]{%
-        \textbf{\glossentryname{##1}} \glossentrydesc{##1}\linebreak%
+        \textbf{\glossentryname{##1}} \glossentrydesc{##1}\par%
     }
 }
 \setglossarystyle{mcolindex-noindent}
