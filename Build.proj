@@ -68,7 +68,7 @@
         <ProcessFile File="$(DownloadDir)\aeneid1.xml"
                      OutputPath="$(LaTeXPath)"
                      CommonWordCount="10"
-                     MaxLines="40" />
+                     MaxLines="100" />
         <Exec Command="$(MakePdf)" WorkingDirectory="$(LaTeXPath)" />
     </Target>
 
