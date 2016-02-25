@@ -9,6 +9,7 @@
 \usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
 \usepackage{multicol}
 \usepackage{uncommonfootnote}
+\usepackage{fancyhdr}
 
 % use two-column footnotes
 \usepackage{dblfnote}
@@ -54,6 +55,15 @@
 % uncommon words
 \input{uncommonwords.tex}
 
+\pagestyle{fancy}
+\fancyhead{}
+\fancyhead[RO,LE]{\thepage}
+\fancyhead[CO]{BOOK I, \theCurrentLine}
+\fancyhead[CE]{THE AENEID, \theCurrentLine}
+\fancyfoot{}
+\renewcommand\headrulewidth{0pt}
+\renewcommand\footrulewidth{0pt}
+
 \begin{document}
 
     %\maketitle
@@ -72,6 +82,7 @@
         \input{content.tex}
     \end{linenumbers}
 
+    \pagestyle{plain}
     \printcommonglossary
     \printuncommonglossary
 
