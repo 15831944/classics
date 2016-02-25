@@ -11,7 +11,6 @@ namespace IxMilia.Classics
 {
     public class LatinDictionary
     {
-        private readonly List<DictionaryEntry> _entries = new List<DictionaryEntry>();
         private readonly Regex _definitionMatcher = new Regex(@"^#(.*)  ([A-Z].*)\[(.....)\] :: (.*)$");
         //                                                        ^^^^ word
         //                                                              ^^^^^^^^^ part of speech
@@ -19,6 +18,7 @@ namespace IxMilia.Classics
         //                                                                                      ^^^^ definition
 
         private Assembly CurrentAssembly => typeof(LatinDictionary).GetTypeInfo().Assembly;
+        private Trie<char, Stem> _stemCache = new Trie<char, Stem>();
 
         public LatinDictionary()
         {
@@ -74,42 +74,26 @@ namespace IxMilia.Classics
 
         private IEnumerable<DefinitionPart> GetDefinitionParts(string word)
         {
-            // TODO: n^3 linear search hurts my soul; precompute and cache stems in a trie
             var result = new List<DefinitionPart>();
-            foreach (var entry in _entries)
+            var matchingStems = _stemCache.GetValues(word.ToCharArray());
+            foreach (var stem in matchingStems)
             {
-                // cached `-ne` and `-que` enclitics for later use
-                if (entry.PartOfSpeech == PartOfSpeech.Conjunction)
+                var forms = new List<WordForm>();
+                if (word.StartsWith(stem.StemPart))
                 {
-                    if (entry.Entry == "ne" && _neEnclitic == null)
+                    foreach (var form in stem.GetForms())
                     {
-                        _neEnclitic = entry;
-                    }
-                    else if (entry.Entry == "que" && _queEnclitic == null)
-                    {
-                        _queEnclitic = entry;
+                        if (word.Length == form.Stem.StemPart.Length + form.Suffix.Length && word.EndsWith(form.Suffix))
+                        {
+                            forms.Add(form);
+                        }
                     }
                 }
 
-                foreach (var stem in entry.GetStems().Where(e => e.StemPart != null))
+                if (forms.Count > 0)
                 {
-                    var forms = new List<WordForm>();
-                    if (word.StartsWith(stem.StemPart))
-                    {
-                        foreach (var form in stem.GetForms())
-                        {
-                            if (word.Length == form.Stem.StemPart.Length + form.Suffix.Length && word.EndsWith(form.Suffix))
-                            {
-                                forms.Add(form);
-                            }
-                        }
-                    }
-
-                    if (forms.Count > 0)
-                    {
-                        var part = new DefinitionPart(stem, new Span(0, word.Length), forms);
-                        result.Add(part);
-                    }
+                    var part = new DefinitionPart(stem, new Span(0, word.Length), forms);
+                    result.Add(part);
                 }
             }
 
@@ -215,7 +199,26 @@ namespace IxMilia.Classics
                 var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
                 if (dictEntry != null)
                 {
-                    _entries.Add(dictEntry);
+                    // cached `-ne` and `-que` enclitics for later use
+                    if (dictEntry.PartOfSpeech == PartOfSpeech.Conjunction)
+                    {
+                        if (dictEntry.Entry == "ne" && _neEnclitic == null)
+                        {
+                            _neEnclitic = dictEntry;
+                        }
+                        else if (dictEntry.Entry == "que" && _queEnclitic == null)
+                        {
+                            _queEnclitic = dictEntry;
+                        }
+                    }
+
+                    foreach (var stem in dictEntry.GetStems())
+                    {
+                        if (stem.StemPart?.Length > 0)
+                        {
+                            _stemCache.Add(stem.StemPart.ToCharArray(), stem);
+                        }
+                    }
                 }
             }
         }

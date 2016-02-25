@@ -37,6 +37,7 @@
     <Compile Include="Person.cs" />
     <Compile Include="Span.cs" />
     <Compile Include="Tense.cs" />
+    <Compile Include="Trie`2.cs" />
     <Compile Include="UnsupportedEntry.cs" />
     <Compile Include="VerbEntry.cs" />
     <Compile Include="VerbForm.cs" />
