@@ -33,15 +33,18 @@
     }
     \renewcommand*{\glossentry}[2]{%
         \textbf{\glossentryname{##1}} \glossentrydesc{##1}\par%
+        \markboth{##1}{##1}%
     }
 }
 \setglossarystyle{mcolindex-noindent}
 
-\newcommand\newchapter[1]{%
-    %\chapter*{#1}
+\newcommand\currentbook{1}
+\newcommand\newbook[1]{%
+    \renewcommand\currentbook{#1}
+    \section*{Book #1}
     %\cleardoublepage
     %\phantomsection
-    %\addcontentsline{toc}{chapter}{#1}
+    \addcontentsline{toc}{section}{Book #1}
 }
 
 \newcounter{CurrentLine}
@@ -49,28 +52,32 @@
 \newcommand\lline[1]{\linebreak\NewLine{#1}}
 \newcommand\pline[1]{\par\NewLine{#1}}
 
+\newcounter{FirstLineOnPage}
+\AddEverypageHook{\setcounter{FirstLineOnPage}{\theCurrentLine}}
+
 % common words
 \input{commonwords.tex}
 
 % uncommon words
 \input{uncommonwords.tex}
 
-\pagestyle{fancy}
-\fancyhead{}
-\fancyhead[RO,LE]{\thepage}
-\fancyhead[CO]{BOOK I, \theCurrentLine}
-\fancyhead[CE]{THE AENEID, \theCurrentLine}
-\fancyfoot{}
-\renewcommand\headrulewidth{0pt}
-\renewcommand\footrulewidth{0pt}
-
 \begin{document}
 
-    %\maketitle
-    %\tableofcontents
+    \maketitle
+    \tableofcontents
 
-    %\newchapter{Introduction}
-    %TODO: introduction
+    \chapter{Introduction}
+    TODO: introduction
+
+    \pagestyle{fancy}
+    \fancyhead{}
+    \fancyhead[RO,LE]{\thepage}
+    \fancyhead[CO]{BOOK \currentbook, \theFirstLineOnPage--\theCurrentLine}
+    \fancyhead[CE]{THE AENEID, \theFirstLineOnPage--\theCurrentLine}
+    \fancyfoot{}
+    \renewcommand\headrulewidth{0pt}
+    \renewcommand\footrulewidth{0pt}
+    \chapter{The Aeneid}
 
     \begin{linenumbers}
         \raggedright
@@ -83,6 +90,14 @@
     \end{linenumbers}
 
     \pagestyle{plain}
+    \cleardoublepage
+    \pagestyle{fancy}
+    \fancyhead{}
+    \fancyhead[L]{\rightmark}
+    \fancyhead[R]{\leftmark}
+    \fancyfoot[C]{\thepage}
+    \renewcommand\chaptermark{}
+    \renewcommand\sectionmark{}
     \printcommonglossary
     \printuncommonglossary
 
