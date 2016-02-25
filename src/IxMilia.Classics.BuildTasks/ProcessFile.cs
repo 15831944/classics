@@ -40,7 +40,7 @@ namespace IxMilia.Classics.BuildTasks
             var content = new StringBuilder();
             var definedWords = new Dictionary<string, Tuple<int, string, string>>();
 
-            content.AppendLine(@"\newchapter{Book 1}");
+            content.AppendLine($@"\newbook{{{_bookNumber}}}");
 
             // define all words
             _currentLine = 1;
