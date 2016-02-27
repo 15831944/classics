@@ -12,4 +12,4 @@
 *.ppg
 commonwords.tex
 uncommonwords.tex
-content.tex
+content[0-9]*.tex

@@ -49,8 +49,18 @@
     </Target>
 
     <Target Name="DownloadSources" DependsOnTargets="CreateDirectories">
-        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1"
-                      Destination="$(DownloadDir)\aeneid1.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D1" Destination="$(DownloadDir)\aeneid1.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D2" Destination="$(DownloadDir)\aeneid2.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D3" Destination="$(DownloadDir)\aeneid3.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D4" Destination="$(DownloadDir)\aeneid4.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D5" Destination="$(DownloadDir)\aeneid5.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D6" Destination="$(DownloadDir)\aeneid6.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D7" Destination="$(DownloadDir)\aeneid7.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D8" Destination="$(DownloadDir)\aeneid8.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D9" Destination="$(DownloadDir)\aeneid9.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D10" Destination="$(DownloadDir)\aeneid10.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D11" Destination="$(DownloadDir)\aeneid11.xml" />
+        <DownloadFile Url="http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0055%3Abook%3D12" Destination="$(DownloadDir)\aeneid12.xml" />
     </Target>
 
     <Target Name="Build" DependsOnTargets="RestorePackages">
@@ -64,8 +74,23 @@
                  Targets="Build" />
     </Target>
 
+    <ItemGroup>
+        <FilesToProcess Include="$(DownloadDir)\aeneid1.xml" />
+        <!--<FilesToProcess Include="$(DownloadDir)\aeneid2.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid3.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid4.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid5.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid6.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid7.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid8.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid9.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid10.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid11.xml" />
+        <FilesToProcess Include="$(DownloadDir)\aeneid12.xml" />-->
+    </ItemGroup>
+
     <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
-        <ProcessFile File="$(DownloadDir)\aeneid1.xml"
+        <ProcessFile Files="@(FilesToProcess)"
                      OutputPath="$(LaTeXPath)"
                      CommonWordCount="10"
                      MaxLines="100" />

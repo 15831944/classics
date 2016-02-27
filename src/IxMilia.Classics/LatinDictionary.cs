@@ -194,7 +194,7 @@ namespace IxMilia.Classics
                 var entry = match.Groups[1].Value.Trim();
                 var pos = match.Groups[2].Value.Trim();
                 var flags = match.Groups[3].Value.Trim();
-                var definition = match.Groups[4].Value.Trim().TrimEnd(';');
+                var definition = match.Groups[4].Value.Trim().TrimEnd(';').Replace("/", ", ");
 
                 var dictEntry = DictionaryEntry.ParseDictionaryEntry(entry, pos, flags, definition);
                 if (dictEntry != null)

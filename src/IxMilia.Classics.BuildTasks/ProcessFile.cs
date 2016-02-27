@@ -15,7 +15,7 @@ namespace IxMilia.Classics.BuildTasks
     public class ProcessFile : Task
     {
         [Required]
-        public string File { get; set; }
+        public string[] Files { get; set; }
 
         [Required]
         public string OutputPath { get; set; }
@@ -34,65 +34,70 @@ namespace IxMilia.Classics.BuildTasks
 
         public override bool Execute()
         {
-            LoadFile();
             var latin = new LatinDictionary();
-
-            var content = new StringBuilder();
             var definedWords = new Dictionary<string, Tuple<int, string, string>>();
-
-            content.AppendLine($@"\newbook{{{_bookNumber}}}");
-
-            // define all words
-            _currentLine = 1;
             _definedWords = 0;
             _undefinedWords = 0;
-            var macro = "lline";
-            foreach (var element in _elements)
+
+            foreach (var file in Files)
             {
-                if (MaxLines > 0 && _currentLine > MaxLines)
-                {
-                    break;
-                }
+                LoadFile(file);
 
-                AssertCurrentLineNumber(element);
-                switch (element.Name.LocalName)
+                var content = new StringBuilder();
+                content.AppendLine($@"\newbook{{{_bookNumber}}}");
+
+                // define all words
+                _currentLine = 1;
+                var macro = "lline";
+                foreach (var element in _elements)
                 {
-                    case "milestone":
-                        macro = "pline";
+                    if (MaxLines > 0 && _currentLine > MaxLines)
+                    {
                         break;
-                    case "l":
-                        content.Append(@"\" + macro + "{");
-                        macro = "lline";
-                        var wb = new StringBuilder();
-                        foreach (var c in element.Value)
-                        {
-                            if (char.IsLetter(c))
+                    }
+
+                    AssertCurrentLineNumber(element);
+                    switch (element.Name.LocalName)
+                    {
+                        case "milestone":
+                            macro = "pline";
+                            break;
+                        case "l":
+                            content.Append(@"\" + macro + "{");
+                            macro = "lline";
+                            var wb = new StringBuilder();
+                            foreach (var c in element.Value)
                             {
-                                wb.Append(c);
-                            }
-                            else
-                            {
-                                if (wb.Length > 0)
+                                if (char.IsLetter(c))
                                 {
-                                    var word = wb.ToString();
-                                    wb.Clear();
-                                    DefineAndPrintWord(latin, content, definedWords, word);
+                                    wb.Append(c);
                                 }
+                                else
+                                {
+                                    if (wb.Length > 0)
+                                    {
+                                        var word = wb.ToString();
+                                        wb.Clear();
+                                        DefineAndPrintWord(latin, content, definedWords, word);
+                                    }
 
-                                AppendCharacter(content, c);
+                                    AppendCharacter(content, c);
+                                }
                             }
-                        }
 
-                        if (wb.Length > 0)
-                        {
-                            DefineAndPrintWord(latin, content, definedWords, wb.ToString());
-                            wb.Clear();
-                        }
+                            if (wb.Length > 0)
+                            {
+                                DefineAndPrintWord(latin, content, definedWords, wb.ToString());
+                                wb.Clear();
+                            }
 
-                        content.AppendLine("}");
-                        _currentLine++;
-                        break;
+                            content.AppendLine("}");
+                            _currentLine++;
+                            break;
+                    }
                 }
+
+                File.WriteAllText(Path.Combine(OutputPath, $"content{_bookNumber}.tex"), content.ToString());
             }
 
             // sort common/uncommon words
@@ -100,9 +105,8 @@ namespace IxMilia.Classics.BuildTasks
             var commonWords = ordered.Take(CommonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
             var uncommonWords = ordered.Skip(CommonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
 
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "content.tex"), content.ToString());
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
-            System.IO.File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(OutputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(OutputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
 
             if (MaxLines > 0)
             {
@@ -122,13 +126,13 @@ namespace IxMilia.Classics.BuildTasks
                     sb.Append(' ');
                     break;
                 case '<':
-                    sb.Append(@"\textless ");
+                    sb.Append(@"\textless{}");
                     break;
                 case '>':
-                    sb.Append(@"\textgreater ");
+                    sb.Append(@"\textgreater{}");
                     break;
                 case '\\':
-                    sb.Append(@"\textbackslash ");
+                    sb.Append(@"\textbackslash{}");
                     break;
                 case '%':
                 case '{':
@@ -212,10 +216,10 @@ namespace IxMilia.Classics.BuildTasks
             }
         }
 
-        private void LoadFile()
+        private void LoadFile(string file)
         {
-            var file = XDocument.Load(File).Root;
-            var content = file.Element("text").Element("body").Element("div1");
+            var document = XDocument.Load(file).Root;
+            var content = document.Element("text").Element("body").Element("div1");
             _bookNumber = int.Parse(content.Attribute("n").Value);
             _elements = content.Elements();
         }
@@ -233,7 +237,7 @@ namespace IxMilia.Classics.BuildTasks
                 var line = int.Parse(natt.Value);
                 if (line != _currentLine)
                 {
-                    throw new Exception($"Expected current line to be {line} but was {_currentLine}");
+                    Log.LogError($"Expected current line to be {line} but was {_currentLine} while processing book {_bookNumber}.");
                 }
             }
         }
