@@ -35,6 +35,7 @@
     <Compile Include="NounStemWithGeneratedForms.cs" />
     <Compile Include="NounStemWithSpecificForm.cs" />
     <Compile Include="Person.cs" />
+    <Compile Include="PrepositionEntry.cs" />
     <Compile Include="Span.cs" />
     <Compile Include="Tense.cs" />
     <Compile Include="Trie`2.cs" />

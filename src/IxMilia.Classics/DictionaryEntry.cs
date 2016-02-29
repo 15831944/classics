@@ -34,6 +34,8 @@ namespace IxMilia.Classics
                     return new ConjuctionEntry(entry, definition, flags);
                 case "N":
                     return NounEntry.TryParse(entry, pos, flags, definition);
+                case "PREP":
+                    return new PrepositionEntry(entry, definition, flags);
                 case "V":
                     return VerbEntry.TryParse(entry, pos, flags, definition);
                 default:
