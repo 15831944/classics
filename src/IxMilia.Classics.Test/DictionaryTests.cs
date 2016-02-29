@@ -62,6 +62,12 @@ namespace IxMilia.Classics.Test
         }
 
         [Fact]
+        public void NounPartOfSpeechParseTest4()
+        {
+            AssertNounType("epos", Declension.Third, Gender.Neuter);
+        }
+
+        [Fact]
         public void NounMatchesMultipleStemsButOnlyOneFormTest()
         {
             AssertNounType("arma", Declension.Second, Gender.Neuter);

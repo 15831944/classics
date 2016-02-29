@@ -7,12 +7,16 @@ namespace IxMilia.Classics
 {
     public class NounStemWithSpecificForm : NounStem, IEnumerable
     {
-        private NounForm[] _forms;
+        private List<NounForm> _forms = new List<NounForm>();
 
-        public NounStemWithSpecificForm(Declension declension, Gender gender, Case @case, Number number, string specificForm, DictionaryEntry entry)
+        public NounStemWithSpecificForm(Declension declension, Gender gender, string specificForm, DictionaryEntry entry)
             : base(declension, gender, specificForm, entry)
         {
-            _forms = new[] { new NounForm(this, @case, number, string.Empty) };
+        }
+
+        public void Add(Case @case, Number number)
+        {
+            _forms.Add(new NounForm(this, @case, number, string.Empty));
         }
 
         public override IEnumerable<WordForm> GetForms() => _forms;
