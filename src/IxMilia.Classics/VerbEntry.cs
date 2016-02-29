@@ -9,6 +9,7 @@ namespace IxMilia.Classics
     public class VerbEntry : DictionaryEntry
     {
         private static readonly Regex _verbMatcher = new Regex(@"V \(([12345])..\)");
+        private IEnumerable<Stem> _stems;
 
         public Conjugation Conjugation { get; }
 
@@ -35,6 +36,16 @@ namespace IxMilia.Classics
         }
 
         public override IEnumerable<Stem> GetStems()
+        {
+            if (_stems == null)
+            {
+                _stems = GenerateStems();
+            }
+
+            return _stems;
+        }
+
+        private IEnumerable<Stem> GenerateStems()
         {
             var firstpp = GetFirstPrincipalPart();
             yield return new VerbStemWithSpecificForm(Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Present, firstpp, this);

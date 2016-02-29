@@ -9,6 +9,7 @@ namespace IxMilia.Classics
     public class NounEntry : DictionaryEntry
     {
         private static readonly Regex _nounMatcher = new Regex(@"N \(([12345])..\) ([MFN])");
+        private IEnumerable<Stem> _stems;
 
         public Declension Declension { get; }
         public Gender Gender { get; }
@@ -23,6 +24,16 @@ namespace IxMilia.Classics
         }
 
         public override IEnumerable<Stem> GetStems()
+        {
+            if (_stems == null)
+            {
+                _stems = GenerateStems();
+            }
+
+            return _stems;
+        }
+
+        private IEnumerable<Stem> GenerateStems()
         {
             var nominative = GetNominativeSingularForm();
             var genitiveStem = GetGenitiveSingularStem();
