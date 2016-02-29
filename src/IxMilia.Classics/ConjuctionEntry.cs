@@ -6,16 +6,19 @@ namespace IxMilia.Classics
 {
     public class ConjuctionEntry : DictionaryEntry
     {
+        private Stem[] _stems;
+
         public ConjuctionEntry(string entry, string definition, string flags)
             : base(entry, definition, flags)
         {
+            _stems = new[] { new BasicStem(Entry, this) };
         }
 
         public override PartOfSpeech PartOfSpeech => PartOfSpeech.Conjunction;
 
         public override IEnumerable<Stem> GetStems()
         {
-            yield return new BasicStem(Entry, this);
+            return _stems;
         }
     }
 }
