@@ -110,7 +110,7 @@ namespace IxMilia.Classics.BuildTasks
 
             if (MaxLines > 0)
             {
-                Log.LogError($"Failing the build because {nameof(MaxLines)} was specified.");
+                Log.LogWarning($"Warning because because {nameof(MaxLines)} was specified.");
             }
 
             Log.LogMessage($"Defined {_definedWords} words with {_undefinedWords} undefined.  {_definedWords * 100.0 / (_definedWords + _undefinedWords)}% success rate.");
@@ -181,7 +181,7 @@ namespace IxMilia.Classics.BuildTasks
             {
                 case 0:
                     _undefinedWords++;
-                    Log.LogError($"Unable to define {word} on line {_currentLine}.");
+                    Log.LogWarning($"Unable to define {word} on line {_currentLine}.");
                     break;
                 case 1:
                     defined = true;
@@ -206,7 +206,7 @@ namespace IxMilia.Classics.BuildTasks
                     break;
                 default:
                     _undefinedWords++;
-                    Log.LogError($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", definitionGroups.SelectMany(m => m.Parts.Select(fs => fs.Stem.Entry.Entry)))}].");
+                    Log.LogWarning($"Ambiguous definition for {word} on line {_currentLine}: [{string.Join("; ", definitionGroups.SelectMany(m => m.Parts.Select(fs => fs.Stem.Entry.Entry)))}].");
                     break;
             }
 
@@ -237,7 +237,7 @@ namespace IxMilia.Classics.BuildTasks
                 var line = int.Parse(natt.Value);
                 if (line != _currentLine)
                 {
-                    Log.LogError($"Expected current line to be {line} but was {_currentLine} while processing book {_bookNumber}.");
+                    Log.LogWarning($"Expected current line to be {line} but was {_currentLine} while processing book {_bookNumber}.");
                 }
             }
         }
