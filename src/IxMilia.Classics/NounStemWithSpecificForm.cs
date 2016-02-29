@@ -5,18 +5,14 @@ using System.Collections.Generic;
 
 namespace IxMilia.Classics
 {
-    public class NounStemWithSpecificForms : NounStem, IEnumerable
+    public class NounStemWithSpecificForm : NounStem, IEnumerable
     {
-        private List<NounForm> _forms = new List<NounForm>();
+        private NounForm[] _forms;
 
-        public NounStemWithSpecificForms(Declension declension, Gender gender, DictionaryEntry entry)
-            : base(declension, gender, string.Empty, entry)
+        public NounStemWithSpecificForm(Declension declension, Gender gender, Case @case, Number number, string specificForm, DictionaryEntry entry)
+            : base(declension, gender, specificForm, entry)
         {
-        }
-
-        internal void Add(Case @case, Number number, string fullForm)
-        {
-            _forms.Add(new NounForm(this, @case, number, fullForm));
+            _forms = new[] { new NounForm(this, @case, number, string.Empty) };
         }
 
         public override IEnumerable<WordForm> GetForms() => _forms;

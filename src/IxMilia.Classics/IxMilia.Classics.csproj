@@ -33,7 +33,7 @@
     <Compile Include="NounEntry.cs" />
     <Compile Include="NounForm.cs" />
     <Compile Include="NounStemWithGeneratedForms.cs" />
-    <Compile Include="NounStemWithSpecificForms.cs" />
+    <Compile Include="NounStemWithSpecificForm.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="Span.cs" />
     <Compile Include="Tense.cs" />
@@ -43,7 +43,7 @@
     <Compile Include="VerbForm.cs" />
     <Compile Include="VerbStem.cs" />
     <Compile Include="VerbStemWithGeneratedForms.cs" />
-    <Compile Include="VerbStemWithSpecificForms.cs" />
+    <Compile Include="VerbStemWithSpecificForm.cs" />
     <Compile Include="Voice.cs" />
     <Compile Include="WordForm.cs" />
     <Compile Include="LatinDictionary.cs" />

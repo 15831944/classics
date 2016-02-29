@@ -49,10 +49,7 @@ namespace IxMilia.Classics
                     if (Gender == Gender.Masculine)
                     {
                         // nom. sg. which could be non-standard like 'vir'
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative}
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
 
                         // all the other forms
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
@@ -73,12 +70,9 @@ namespace IxMilia.Classics
                     else
                     {
                         // nom., acc., and voc. are all the same
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative},
-                            {Case.Accusative, Number.Singluar, nominative},
-                            {Case.Vocative, Number.Singluar, nominative},
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Accusative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                         // all the other forms
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
@@ -98,12 +92,9 @@ namespace IxMilia.Classics
                 case Declension.Third:
                     if (Gender == Gender.Neuter)
                     {
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative},
-                            {Case.Accusative, Number.Singluar, nominative},
-                            {Case.Vocative, Number.Singluar, nominative}
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Accusative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                         // all the other forms
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
@@ -121,11 +112,8 @@ namespace IxMilia.Classics
                     }
                     else
                     {
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative},
-                            {Case.Vocative, Number.Singluar, nominative}
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                         // all the other forms
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
@@ -146,12 +134,9 @@ namespace IxMilia.Classics
                 case Declension.Fourth:
                     if (Gender == Gender.Neuter)
                     {
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative},
-                            {Case.Accusative, Number.Singluar, nominative},
-                            {Case.Vocative, Number.Singluar, nominative}
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Accusative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
                         {
@@ -168,11 +153,8 @@ namespace IxMilia.Classics
                     }
                     else
                     {
-                        yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                        {
-                            {Case.Nominative, Number.Singluar, nominative},
-                            {Case.Vocative, Number.Singluar, nominative}
-                        };
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                        yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                         yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
                         {
@@ -190,11 +172,8 @@ namespace IxMilia.Classics
                     }
                     break;
                 case Declension.Fifth:
-                    yield return new NounStemWithSpecificForms(Declension, Gender, this)
-                    {
-                        {Case.Nominative, Number.Singluar, nominative},
-                        {Case.Vocative, Number.Singluar, nominative},
-                    };
+                    yield return new NounStemWithSpecificForm(Declension, Gender, Case.Nominative, Number.Singluar, nominative, this);
+                    yield return new NounStemWithSpecificForm(Declension, Gender, Case.Vocative, Number.Singluar, nominative, this);
 
                     yield return new NounStemWithGeneratedForms(Declension, Gender, genitiveStem, this)
                     {

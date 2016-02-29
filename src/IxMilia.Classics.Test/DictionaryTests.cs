@@ -62,12 +62,6 @@ namespace IxMilia.Classics.Test
         }
 
         [Fact]
-        public void NounPartOfSpeechParseTest4()
-        {
-            AssertNounType("epos", Declension.Third, Gender.Neuter);
-        }
-
-        [Fact]
         public void NounMatchesMultipleStemsButOnlyOneFormTest()
         {
             AssertNounType("arma", Declension.Second, Gender.Neuter);
@@ -98,6 +92,16 @@ namespace IxMilia.Classics.Test
             Assert.Equal(2, definition.Parts.Count());
             Assert.Equal("armum, armi", definition.Parts.First().Stem.Entry.Entry);
             Assert.Equal("que", definition.Parts.Last().Stem.Entry.Entry);
+        }
+
+        [Fact]
+        public void TrieTest1()
+        {
+            var t = new StringTrie<string>();
+            t.Add("arm", "armum");
+            t.Add("armat", "armatus");
+            t.Add("arment", "armenta");
+            var three = t.GetValues("armenta").ToArray();
         }
     }
 }

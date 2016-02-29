@@ -37,10 +37,7 @@ namespace IxMilia.Classics
         public override IEnumerable<Stem> GetStems()
         {
             var firstpp = GetFirstPrincipalPart();
-            yield return new VerbStemWithSpecificForms(Conjugation, this)
-            {
-                {Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Present, firstpp},
-            };
+            yield return new VerbStemWithSpecificForm(Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Present, firstpp, this);
 
             var presentStem = GetPresentStem();
             if (presentStem != null)
@@ -67,11 +64,7 @@ namespace IxMilia.Classics
                 };
 
                 // future
-                yield return new VerbStemWithSpecificForms(Conjugation, this)
-                {
-                    {Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bo"},
-                    {Conjugation, Person.Third, Number.Plural, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bunt"},
-                };
+                yield return new VerbStemWithSpecificForm(Conjugation, Person.First, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bo", this);
                 yield return new VerbStemWithGeneratedForms(Conjugation, presentStem + "bi", this)
                 {
                     {Person.Second, Number.Singluar, Mood.Indicative, Voice.Active, Tense.Imperfect},
@@ -79,6 +72,7 @@ namespace IxMilia.Classics
                     {Person.First, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
                     {Person.Second, Number.Plural, Mood.Indicative, Voice.Active, Tense.Imperfect},
                 };
+                yield return new VerbStemWithSpecificForm(Conjugation, Person.Third, Number.Plural, Mood.Indicative, Voice.Active, Tense.Future, presentStem + "bunt", this);
             }
         }
 

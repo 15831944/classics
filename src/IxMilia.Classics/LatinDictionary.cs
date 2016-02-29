@@ -18,7 +18,7 @@ namespace IxMilia.Classics
         //                                                                                      ^^^^ definition
 
         private Assembly CurrentAssembly => typeof(LatinDictionary).GetTypeInfo().Assembly;
-        private Trie<char, Stem> _stemCache = new Trie<char, Stem>();
+        private StringTrie<Stem> _stemCache = new StringTrie<Stem>();
 
         public LatinDictionary()
         {
@@ -75,7 +75,7 @@ namespace IxMilia.Classics
         private IEnumerable<DefinitionPart> GetDefinitionParts(string word)
         {
             var result = new List<DefinitionPart>();
-            var matchingStems = _stemCache.GetValues(word.ToCharArray());
+            var matchingStems = _stemCache.GetValues(word);
             foreach (var stem in matchingStems)
             {
                 var forms = new List<WordForm>();
@@ -216,7 +216,7 @@ namespace IxMilia.Classics
                     {
                         if (stem.StemPart?.Length > 0)
                         {
-                            _stemCache.Add(stem.StemPart.ToCharArray(), stem);
+                            _stemCache.Add(stem.StemPart, stem);
                         }
                     }
                 }

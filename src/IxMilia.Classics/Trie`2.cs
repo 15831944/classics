@@ -1,11 +1,23 @@
 ﻿// Copyright (c) IxMilia.  All Rights Reserved.  Licensed under the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace IxMilia.Classics
 {
+    public class StringTrie<TValue> : Trie<char, TValue>
+    {
+        public void Add(string key, TValue value)
+        {
+            Add(key.ToCharArray(), value);
+        }
+
+        public IEnumerable<TValue> GetValues(string key)
+        {
+            return GetValues(key.ToCharArray());
+        }
+    }
+
     public class Trie<TKeyType, TValue>
     {
         private Node _root = new Node();
@@ -17,102 +29,52 @@ namespace IxMilia.Classics
         public void Add(IEnumerable<TKeyType> key, TValue value)
         {
             var keyParts = key.ToArray();
-            _root.Add(keyParts, value);
+            _root.Add(keyParts, value, 0);
         }
 
         public IEnumerable<TValue> GetValues(IEnumerable<TKeyType> key)
         {
-            return _root.Get(key.ToArray());
+            return _root.Get(key.ToArray(), 0);
         }
 
-        private abstract class NodeOrValue
+        private class Node
         {
-        }
+            public Dictionary<TKeyType, Node> Children { get; } = new Dictionary<TKeyType, Node>();
+            public List<TValue> Values = new List<TValue>();
 
-        private class NodeValue : NodeOrValue
-        {
-            public TValue Value { get; }
-
-            public NodeValue(TValue value)
+            public void Add(TKeyType[] keys, TValue value, int keyOffset)
             {
-                Value = value;
-            }
-        }
-
-        private class Node : NodeOrValue
-        {
-            public Dictionary<TKeyType, List<NodeOrValue>> Children { get; } = new Dictionary<TKeyType, List<NodeOrValue>>();
-
-            public void Add(TKeyType[] keys, TValue value)
-            {
-                if (keys.Length == 0)
+                if (keyOffset >= keys.Length)
                 {
-                    throw new InvalidOperationException("Keys cannot be empty");
-                }
-
-                var key = keys[0];
-                if (!Children.ContainsKey(key))
-                {
-                    Children[key] = new List<NodeOrValue>();
-                }
-
-                NodeOrValue addedNode;
-                if (keys.Length == 1)
-                {
-                    addedNode = new NodeValue(value);
+                    Values.Add(value);
                 }
                 else
                 {
-                    var node = new Node();
-                    node.Add(keys.Skip(1).ToArray(), value);
-                    addedNode = node;
-                }
-
-                Children[key].Add(addedNode);
-            }
-
-            public IEnumerable<TValue> Get(TKeyType[] keys)
-            {
-                if (keys.Length == 0 || !Children.ContainsKey(keys[0]))
-                {
-                    yield break;
-                }
-                else
-                {
-                    foreach (var collection in Children.Values)
+                    var key = keys[keyOffset];
+                    if (!Children.ContainsKey(key))
                     {
-                        var newKeys = keys.Skip(1).ToArray();
-                        foreach (var childNode in collection)
-                        {
-                            if (childNode is NodeValue)
-                            {
-                                yield return ((NodeValue)childNode).Value;
-                            }
-                            else
-                            {
-                                foreach (var childValue in ((Node)childNode).Get(newKeys))
-                                {
-                                    yield return childValue;
-                                }
-                            }
-                        }
+                        Children[key] = new Node();
                     }
+
+                    Children[key].Add(keys, value, keyOffset + 1);
                 }
             }
 
-            private IEnumerable<TValue> GetAllChildValues()
+            public IEnumerable<TValue> Get(TKeyType[] keys, int keyOffset)
             {
-                foreach (var item in Children.Values.SelectMany(x => x))
+                foreach (var value in Values)
                 {
-                    if (item is NodeValue)
+                    yield return value;
+                }
+
+                if (keyOffset < keys.Length)
+                {
+                    var key = keys[keyOffset];
+                    if (Children.ContainsKey(key))
                     {
-                        yield return ((NodeValue)item).Value;
-                    }
-                    else
-                    {
-                        foreach (var childValue in ((Node)item).GetAllChildValues())
+                        foreach (var childItem in Children[key].Get(keys, keyOffset + 1))
                         {
-                            yield return childValue;
+                            yield return childItem;
                         }
                     }
                 }
