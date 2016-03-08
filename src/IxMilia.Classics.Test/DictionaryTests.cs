@@ -101,6 +101,13 @@ namespace IxMilia.Classics.Test
         }
 
         [Fact]
+        public void AdjectiveTest()
+        {
+            var defPart = Latin.GetDefinitions("parvi").Single().Parts.Single();
+            Assert.True(defPart.Stem.Entry.Entry.StartsWith("parvus, parva -um"));
+        }
+
+        [Fact]
         public void TrieTest1()
         {
             var t = new StringTrie<string>();

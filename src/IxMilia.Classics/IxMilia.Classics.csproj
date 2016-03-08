@@ -19,6 +19,11 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' " />
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' " />
   <ItemGroup>
+    <Compile Include="AdjectiveEntry.cs" />
+    <Compile Include="AdjectiveForm.cs" />
+    <Compile Include="AdjectiveStem.cs" />
+    <Compile Include="AdjectiveStemWithGeneratedForms.cs" />
+    <Compile Include="AdjectiveStemWithSpecificForm.cs" />
     <Compile Include="BasicStem.cs" />
     <Compile Include="BasicWordForm.cs" />
     <Compile Include="ConjuctionEntry.cs" />
