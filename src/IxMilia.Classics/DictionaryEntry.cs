@@ -10,7 +10,7 @@ namespace IxMilia.Classics
     {
         public string EntryKey { get; }
         public string Entry { get; }
-        public string Definition { get; }
+        public string Definition { get; internal set; }
         public string Flags { get; }
 
         public abstract PartOfSpeech PartOfSpeech { get; }

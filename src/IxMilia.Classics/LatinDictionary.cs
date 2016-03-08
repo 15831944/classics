@@ -104,6 +104,7 @@ namespace IxMilia.Classics
         {
             var dictionaryStream = CurrentAssembly.GetManifestResourceStream("IxMilia.Classics.Downloads.DICTPAGE.RAW");
             var streamReader = new StreamReader(dictionaryStream);
+            DictionaryEntry lastEntry = null;
             for (var line = streamReader.ReadLine(); line != null; line = streamReader.ReadLine())
             {
                 // each line in the dictionary looks like this:
@@ -212,13 +213,24 @@ namespace IxMilia.Classics
                         }
                     }
 
-                    foreach (var stem in dictEntry.GetStems())
+                    // continued definitions
+                    if (dictEntry.Definition.StartsWith("|"))
                     {
-                        if (stem.StemPart?.Length > 0)
+                        lastEntry.Definition += "; " + dictEntry.Definition.TrimStart('|');
+                    }
+                    else
+                    {
+                        lastEntry = null;
+                        foreach (var stem in dictEntry.GetStems())
                         {
-                            _stemCache.Add(stem.StemPart, stem);
+                            if (stem.StemPart?.Length > 0)
+                            {
+                                _stemCache.Add(stem.StemPart, stem);
+                            }
                         }
                     }
+
+                    lastEntry = dictEntry;
                 }
             }
         }
