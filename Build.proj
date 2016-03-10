@@ -100,7 +100,7 @@
     <Target Name="Web">
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Web\IxMilia.Classics.Web.csproj"
-                 Properties="TreatWarningsAsErrors=true;OutputPath=$(OutputPath)"
+                 Properties="TreatWarningsAsErrors=true;DeployOnBuild=true;PublishProfile=IxMiliaProfile"
                  Targets="Build" />
     </Target>
 
