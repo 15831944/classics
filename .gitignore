@@ -2,6 +2,7 @@
 Binaries/
 Downloads/
 obj/
+bin/
 Output/
 packages/
 NuGet.exe

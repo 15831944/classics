@@ -97,6 +97,13 @@
         <Exec Command="$(MakePdf)" WorkingDirectory="$(LaTeXPath)" />
     </Target>
 
+    <Target Name="Web">
+        <MSBuild BuildInParallel="true"
+                 Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Web\IxMilia.Classics.Web.csproj"
+                 Properties="TreatWarningsAsErrors=true;OutputPath=$(OutputPath)"
+                 Targets="Build" />
+    </Target>
+
     <Target Name="Test" DependsOnTargets="Build">
         <MSBuild BuildInParallel="true"
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Test\IxMilia.Classics.Test.csproj"
