@@ -25,5 +25,6 @@
         $("#translate-button").click(function () {
             getTranslation();
         });
+        $("#latin-text").focus();
     });
 })();
