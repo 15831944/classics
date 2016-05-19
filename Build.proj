@@ -16,7 +16,9 @@
         <SolutionDir>$(MSBuildThisFileDirectory)src</SolutionDir>
         <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
         <TestAssembly>$(SolutionDir)\Binaries\$(Configuration)\IxMilia.Classics.Test.dll</TestAssembly>
-        <NuGetExe>$(MSBuildThisFileDirectory)src\.nuget\NuGet.exe</NuGetExe>
+        <NuGetDir>$(MSBuildThisFileDirectory)src\.nuget</NuGetDir>
+        <NuGetExe>$(NuGetDir)\NuGet.exe</NuGetExe>
+        <NuGetConfig>$(NuGetDir)\nuget.config</NuGetConfig>
         <MakePdf>make-pdf.bat</MakePdf>
     </PropertyGroup>
 
@@ -31,8 +33,8 @@
     </ItemGroup>
 
     <Target Name="RestorePackages">
-        <DownloadFile Url="https://www.nuget.org/nuget.exe" Destination="$(NuGetExe)" />
-        <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot;" />
+        <DownloadFile Url="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" Destination="$(NuGetExe)" Condition="!Exists('$(NuGetExe)')" />
+        <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot; /ConfigFile &quot;$(NuGetConfig)&quot;" />
     </Target>
 
     <Target Name="BuildTasks">

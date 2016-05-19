@@ -6,4 +6,5 @@ bin/
 Output/
 packages/
 NuGet.exe
+project.lock.json
 *.user
