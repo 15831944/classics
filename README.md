@@ -77,7 +77,7 @@ dictionaries, but will instead be able to fetch them from online resources.
 ### Usage
 
 ``` bash
-msbuild Build.proj
+msbuild
 ```
 
-`LaTeX\Aeneid.pdf` is the final output.
+`Documents\Aeneid\Aeneid.pdf` is the final output.

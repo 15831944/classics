@@ -11,7 +11,8 @@
     <PropertyGroup>
         <DownloadDir Condition="'$(DownloadDir)' == ''">$(MSBuildThisFileDirectory)Downloads</DownloadDir>
         <SourceDir Condition="'$(SourceDir)' == ''">$(MSBuildThisFileDirectory)src</SourceDir>
-        <LaTeXPath Condition="'$(LaTeXPath)' == ''">$(MSBuildThisFileDirectory)\LaTeX</LaTeXPath>
+        <DocumentsPath Condition="'$(DocumentsPath)' == ''">$(MSBuildThisFileDirectory)Documents</DocumentsPath>
+        <AeneidPath Condition="'$(AeneidPath)' == ''">$(DocumentsPath)\Aeneid</AeneidPath>
         <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
         <SolutionDir>$(MSBuildThisFileDirectory)src</SolutionDir>
         <SolutionFile>$(SolutionDir)\IxMilia.Classics.sln</SolutionFile>
@@ -23,8 +24,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <LaTeXFiles Include="$(LaTeXPath)\Aeneid.tex" />
-        <LaTeXFiles Include="$(LaTeXPath)\make-pdf.bat" />
+        <AeneidFiles Include="$(AeneidPath)\Aeneid.tex" />
+        <AeneidFiles Include="$(AeneidPath)\make-pdf.bat" />
     </ItemGroup>
 
     <ItemGroup>
@@ -93,10 +94,10 @@
 
     <Target Name="Process" DependsOnTargets="Build;DownloadSources;BuildTasks">
         <ProcessFile Files="@(FilesToProcess)"
-                     OutputPath="$(LaTeXPath)"
+                     OutputPath="$(AeneidPath)"
                      CommonWordCount="10"
                      MaxLines="100" />
-        <Exec Command="$(MakePdf)" WorkingDirectory="$(LaTeXPath)" />
+        <Exec Command="$(MakePdf)" WorkingDirectory="$(AeneidPath)" />
     </Target>
 
     <Target Name="Web">
