@@ -35,7 +35,7 @@
 
     <Target Name="RestorePackages">
         <DownloadFile Url="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" Destination="$(NuGetExe)" Condition="!Exists('$(NuGetExe)')" />
-        <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot; /ConfigFile &quot;$(NuGetConfig)&quot;" />
+        <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot;" />
     </Target>
 
     <Target Name="BuildTasks">
