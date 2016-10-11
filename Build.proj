@@ -33,6 +33,9 @@
         <DirectoriesToClean Include="$(MSBuildThisFileDirectory)src\Binaries" />
     </ItemGroup>
 
+    <UsingTask TaskName="Xunit.Runner.MSBuild.xunit"
+               AssemblyFile="$(MSBuildThisFileDirectory)src\packages\xunit.runner.msbuild.2.1.0\build\portable-net45+win8+wp8+wpa81\xunit.runner.msbuild.dll" />
+
     <Target Name="RestorePackages">
         <DownloadFile Url="https://dist.nuget.org/win-x86-commandline/latest/nuget.exe" Destination="$(NuGetExe)" Condition="!Exists('$(NuGetExe)')" />
         <Exec Command="&quot;$(NuGetExe)&quot; restore &quot;$(SolutionFile)&quot;" />
@@ -112,7 +115,7 @@
                  Projects="$(MSBuildThisFileDirectory)src\IxMilia.Classics.Test\IxMilia.Classics.Test.csproj"
                  Properties="TreatWarningsAsErrors=true"
                  Targets="Build" />
-        <Exec Command="$(MSBuildThisFileDirectory)src\packages\xunit.runners.1.9.2\tools\xunit.console.clr4.exe $(TestAssembly)" />
+        <xunit Assemblies="$(TestAssembly)" />
     </Target>
 
     <Target Name="Clean">
