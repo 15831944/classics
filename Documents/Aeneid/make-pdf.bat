@@ -3,6 +3,7 @@ del Aeneid.pdf
 del Aeneid.ppo
 del Aeneid.ppg
 
+pushd %~dp0
 pdflatex Aeneid.tex
 if errorlevel 1 goto error
 
@@ -15,7 +16,7 @@ if errorlevel 1 goto error
 makeindex -s Aeneid.ist -o Aeneid.uncommon-gls Aeneid.uncommon-glo
 if errorlevel 1 goto error
 
-..\..\src\Binaries\Debug\IxMilia.Classics.ReorderFootnotes.exe Aeneid.ppg Aeneid.ppo
+dotnet run --project %~dp0..\..\src\IxMilia.Classics.ReorderFootnotes\IxMilia.Classics.ReorderFootnotes.csproj Aeneid.ppg Aeneid.ppo
 if errorlevel 1 goto error
 
 pdflatex Aeneid.tex
@@ -24,5 +25,6 @@ if errorlevel 1 goto error
 exit /b 0
 
 :error
+popd
 echo There was an error building the PDF.  See above output for details.
 exit /b 1

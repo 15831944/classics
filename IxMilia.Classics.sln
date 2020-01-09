@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IxMilia.Classics.ReorderFootnotes", "src\IxMilia.Classics.ReorderFootnotes\IxMilia.Classics.ReorderFootnotes.csproj", "{53D7B211-6742-4B1C-BA84-F2605C6F3194}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IxMilia.Classics.ProcessFile", "src\IxMilia.Classics.ProcessFile\IxMilia.Classics.ProcessFile.csproj", "{52D0EE34-FC93-40A8-A752-71D573726F63}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{53D7B211-6742-4B1C-BA84-F2605C6F3194}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53D7B211-6742-4B1C-BA84-F2605C6F3194}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53D7B211-6742-4B1C-BA84-F2605C6F3194}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53D7B211-6742-4B1C-BA84-F2605C6F3194}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52D0EE34-FC93-40A8-A752-71D573726F63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52D0EE34-FC93-40A8-A752-71D573726F63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52D0EE34-FC93-40A8-A752-71D573726F63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52D0EE34-FC93-40A8-A752-71D573726F63}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {729C4F80-81BC-4F15-94A6-66522B470F22}
+	EndGlobalSection
+EndGlobal

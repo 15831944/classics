@@ -1,4 +1,6 @@
 *.aux
+*.fdb_latexmk
+*.fls
 *.ilg
 *.ist
 *.glo
@@ -12,4 +14,6 @@
 *.ppg
 commonwords.tex
 uncommonwords.tex
+undefinedKeys.txt
 content[0-9]*.tex
+LatinDictionary.txt

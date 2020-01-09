@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="IxMilia.Classics.Web.LatinService" CodeBehind="LatinService.svc.cs" %>
