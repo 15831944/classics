@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Xml.Linq;
 
 namespace IxMilia.Classics.ProcessFile
@@ -56,6 +57,8 @@ namespace IxMilia.Classics.ProcessFile
 
                 // go
                 var content = new StringBuilder();
+                var htmlBody = new StringBuilder();
+                htmlBody.AppendLine("<body>");
                 var macro = "lline";
                 foreach (var element in elements)
                 {
@@ -69,6 +72,7 @@ namespace IxMilia.Classics.ProcessFile
                             macro = "pline";
                             break;
                         case "l":
+                            htmlBody.Append($"({_currentLine}) ");
                             content.Append($@"\{macro}{{");
                             macro = "lline";
                             var lineText = element.Value;
@@ -79,15 +83,17 @@ namespace IxMilia.Classics.ProcessFile
                                     var glossed = lineText.Substring(gloss.Offset, gloss.Length);
                                     if (latin.TryGetValue(gloss.Key, out var  defined))
                                     {
-                                        content.Append($@"\agls{{{EscapeString(gloss.Key)}}}{{{EscapeString(glossed)}}}");
                                         var (count, entry, definition) = definedWords.ContainsKey(gloss.Key)
                                             ? definedWords[gloss.Key]
                                             : (0, defined.Entry, defined.Definition);
                                         definedWords[gloss.Key] = (count + 1, entry, definition);
+                                        content.Append($@"\agls{{{EscapeString(gloss.Key)}}}{{{EscapeString(glossed)}}}");
+                                        htmlBody.Append($"<span class='defined'>{HttpUtility.HtmlEncode(glossed)}</span>");
                                     }
                                     else
                                     {
                                         content.Append(EscapeString(glossed));
+                                        htmlBody.Append($"<span class='undefined'>{HttpUtility.HtmlEncode(glossed)}</span>");
                                         undefinedKeys.Add(gloss.Key);
                                     }
 
@@ -96,16 +102,42 @@ namespace IxMilia.Classics.ProcessFile
                                 else
                                 {
                                     AppendCharacter(content, lineText[j]);
+                                    htmlBody.Append(HttpUtility.HtmlEncode(lineText[j]));
                                 }
                             }
 
                             content.AppendLine("}");
+                            htmlBody.AppendLine("<br />");
                             _currentLine++;
                             break;
                     }
                 }
 
+                htmlBody.AppendLine("</body>");
+
+                var htmlContent = new StringBuilder();
+                htmlContent.AppendLine("<html>");
+                htmlContent.AppendLine(@"
+<head>
+  <style>
+    body {
+        color: gray;
+    }
+    .defined {
+        color: black;
+    }
+    .undefined {
+        color: black;
+        background-color: pink;
+    }
+  </style>
+</head>
+");
+                htmlContent.Append(htmlBody);
+                htmlContent.AppendLine("</html>");
+
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.tex"), content.ToString());
+                File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.html"), htmlContent.ToString());
             }
 
             // sort common/uncommon words
