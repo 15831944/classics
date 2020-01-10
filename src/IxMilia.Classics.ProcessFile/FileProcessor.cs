@@ -57,8 +57,8 @@ namespace IxMilia.Classics.ProcessFile
 
                 // go
                 var content = new StringBuilder();
-                var htmlBody = new StringBuilder();
-                htmlBody.AppendLine("<body>");
+                var jsObject = new StringBuilder();
+                jsObject.AppendLine("var data = {");
                 var macro = "lline";
                 foreach (var element in elements)
                 {
@@ -72,10 +72,17 @@ namespace IxMilia.Classics.ProcessFile
                             macro = "pline";
                             break;
                         case "l":
-                            htmlBody.Append($"({_currentLine}) ");
+                            var lineText = element.Value;
+                            
+                            jsObject.AppendLine($"        \"{_currentLine}\": {{");
+                            jsObject.AppendLine($"            \"text\": \"{EscapeStringToJs(lineText)}\",");
+                            jsObject.AppendLine($"            \"glosses\": {{");
+                            WriteGlossToJs(jsObject, latin, glosses.Values.OrderBy(g => g.Offset));
+                            jsObject.AppendLine($"            }},");
+                            jsObject.AppendLine($"        }},");
+
                             content.Append($@"\{macro}{{");
                             macro = "lline";
-                            var lineText = element.Value;
                             for (int j = 0; j < lineText.Length; j++)
                             {
                                 if (glosses.TryGetValue(j, out var gloss))
@@ -87,13 +94,11 @@ namespace IxMilia.Classics.ProcessFile
                                             ? definedWords[gloss.Key]
                                             : (0, defined.Entry, defined.Definition);
                                         definedWords[gloss.Key] = (count + 1, entry, definition);
-                                        content.Append($@"\agls{{{EscapeString(gloss.Key)}}}{{{EscapeString(glossed)}}}");
-                                        htmlBody.Append($"<span class='defined'>{HttpUtility.HtmlEncode(glossed)}</span>");
+                                        content.Append($@"\agls{{{EscapeStringToLatex(gloss.Key)}}}{{{EscapeStringToLatex(glossed)}}}");
                                     }
                                     else
                                     {
-                                        content.Append(EscapeString(glossed));
-                                        htmlBody.Append($"<span class='undefined'>{HttpUtility.HtmlEncode(glossed)}</span>");
+                                        content.Append(EscapeStringToLatex(glossed));
                                         undefinedKeys.Add(gloss.Key);
                                     }
 
@@ -101,39 +106,85 @@ namespace IxMilia.Classics.ProcessFile
                                 }
                                 else
                                 {
-                                    AppendCharacter(content, lineText[j]);
-                                    htmlBody.Append(HttpUtility.HtmlEncode(lineText[j]));
+                                    AppendCharacterToLatex(content, lineText[j]);
                                 }
                             }
 
                             content.AppendLine("}");
-                            htmlBody.AppendLine("<br />");
                             _currentLine++;
                             break;
                     }
                 }
 
-                htmlBody.AppendLine("</body>");
+                jsObject.AppendLine("    };");
 
                 var htmlContent = new StringBuilder();
                 htmlContent.AppendLine("<html>");
-                htmlContent.AppendLine(@"
+                htmlContent.AppendLine($@"
 <head>
-  <style>
-    body {
-        color: gray;
-    }
-    .defined {
-        color: black;
-    }
-    .undefined {
-        color: black;
-        background-color: pink;
-    }
-  </style>
+  <script type='text/javascript'>
+    {jsObject.ToString()}
+    var colors = [
+        '#FF7777',
+        '#77FF77',
+        '#7777FF',
+    ];
+
+    function loadLine() {{
+        var lineNumber = document.getElementById('lineNo').value;
+        var lineData = data[lineNumber];
+        var content = '';
+        var colorIndex = 0;
+        var close = -1;
+        for (var i = 0; i < lineData.text.length; i++) {{
+            if (i == close) {{
+                content += '</span>';
+            }}
+
+            var gloss = lineData.glosses[i];
+            if (gloss) {{
+                close = i + gloss.length;
+                var color = colors[colorIndex++];
+                if (colorIndex >= colors.length) {{
+                    colorIndex = 0;
+                }}
+                content += ""<span style='background: "" + color + ""'>"";
+            }}
+
+            content += lineData.text.substr(i, 1);
+        }}
+
+        document.getElementById('output').innerHTML = content;
+        setGlosses(lineData.glosses);
+    }}
+
+    function setGlosses(glosses) {{
+        var content = '';
+        var colorIndex = 0;
+        for (var gloss in glosses) {{
+            gloss = glosses[gloss];
+            var color = colors[colorIndex++];
+            if (colorIndex >= colors.length) {{
+                colorIndex = 0;
+            }}
+            content += ""<p style='background: "" + color + ""'>"";
+            content += gloss.key + ' / ' + gloss.definition;
+            content += '</p>';
+        }}
+
+        document.getElementById('glosses').innerHTML = content;
+    }}
+
+  </script>
 </head>
+<body>
+    Line number:
+    <input id='lineNo' />
+    <button onclick='loadLine()'>Load line</button>
+    <div id='output'></div>
+    <div id='glosses'></div>
+</body>
 ");
-                htmlContent.Append(htmlBody);
                 htmlContent.AppendLine("</html>");
 
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.tex"), content.ToString());
@@ -145,8 +196,8 @@ namespace IxMilia.Classics.ProcessFile
             var commonWords = ordered.Take(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
             var uncommonWords = ordered.Skip(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
 
-            File.WriteAllText(Path.Combine(outputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
-            File.WriteAllText(Path.Combine(outputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeString(kvp.Key)}}}{{{EscapeString(kvp.Value.Item1)}}}{{{EscapeString(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(outputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(outputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
             File.WriteAllText(Path.Combine(outputPath, "undefinedKeys.txt"), string.Join("\r\n", undefinedKeys.OrderBy(x => x)));
         }
 
@@ -163,7 +214,7 @@ namespace IxMilia.Classics.ProcessFile
             }
         }
 
-        private static void AppendCharacter(StringBuilder sb, char c)
+        private static void AppendCharacterToLatex(StringBuilder sb, char c)
         {
             switch (c)
             {
@@ -197,7 +248,7 @@ namespace IxMilia.Classics.ProcessFile
             }
         }
 
-        private static string EscapeString(string str)
+        private static string EscapeStringToLatex(string str)
         {
             var sb = new StringBuilder();
             var seenStartQuote = false;
@@ -210,7 +261,52 @@ namespace IxMilia.Classics.ProcessFile
                         seenStartQuote = !seenStartQuote;
                         break;
                     default:
-                        AppendCharacter(sb, c);
+                        AppendCharacterToLatex(sb, c);
+                        break;
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        private static void WriteGlossToJs(StringBuilder sb, Dictionary<string, DictionaryEntry> dict, IEnumerable<Gloss> glosses)
+        {
+            foreach (var gloss in glosses)
+            {
+                var definition = dict.ContainsKey(gloss.Key)
+                    ? dict[gloss.Key].Entry
+                    : "UNDEFINED KEY: " + gloss.Key;
+                sb.AppendLine($"                \"{gloss.Offset}\": {{");
+                sb.AppendLine($"                    \"length\": {gloss.Length},");
+                sb.AppendLine($"                    \"key\": \"{EscapeStringToJs(gloss.Key)}\",");
+                sb.AppendLine($"                    \"definition\": \"{EscapeStringToJs(definition)}\",");
+                sb.AppendLine("                },");
+            }
+        }
+
+        private static string EscapeStringToJs(string str)
+        {
+            var sb = new StringBuilder();
+            foreach (var c in str)
+            {
+                switch (c)
+                {
+                    case '"':
+                    case '\\':
+                        sb.Append('\\');
+                        sb.Append(c);
+                        break;
+                    case '\n':
+                        sb.Append("\\n");
+                        break;
+                    case '\r':
+                        sb.Append("\\r");
+                        break;
+                    case '\t':
+                        sb.Append("\\t");
+                        break;
+                    default:
+                        sb.Append(c);
                         break;
                 }
             }
