@@ -273,9 +273,15 @@ namespace IxMilia.Classics.ProcessFile
         {
             foreach (var gloss in glosses)
             {
-                var definition = dict.ContainsKey(gloss.Key)
-                    ? dict[gloss.Key].Entry
-                    : "UNDEFINED KEY: " + gloss.Key;
+                string definition;
+                if (dict.TryGetValue(gloss.Key, out var def))
+                {
+                    definition = $"{def.Entry} / {def.Definition}";
+                }
+                else
+                {
+                    definition = "UNDEFINED KEY: " + gloss.Key;
+                }
                 sb.AppendLine($"                \"{gloss.Offset}\": {{");
                 sb.AppendLine($"                    \"length\": {gloss.Length},");
                 sb.AppendLine($"                    \"key\": \"{EscapeStringToJs(gloss.Key)}\",");
