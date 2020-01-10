@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace IxMilia.Classics.ProcessFile
@@ -15,8 +15,9 @@ namespace IxMilia.Classics.ProcessFile
 
         public static Dictionary<string, DictionaryEntry> LoadDictionary(string path)
         {
+            var duplicateKeys = new HashSet<string>();
             var latin = new Dictionary<string, DictionaryEntry>();
-            DictionaryEntry lastEntry = null;
+            string lastKey = null;
             foreach (var line in File.ReadAllLines(path))
             {
                 // each line in the dictionary looks like this:
@@ -115,24 +116,56 @@ namespace IxMilia.Classics.ProcessFile
                     // continued definitions
                     if (dictEntry.Definition.StartsWith("|"))
                     {
-                        lastEntry.Definition += "; " + dictEntry.Definition.TrimStart('|');
+                        // continued definition, updated existing
+                        latin[lastKey].Definition += "; " + dictEntry.Definition.TrimStart('|');
                     }
                     else
                     {
-                        lastEntry = null;
+                        // new definition, add like normal
+                        var key = dictEntry.EntryKey;
+                        if (latin.TryGetValue(key, out var duplicate))
+                        {
+                            // save colliding key to remove later
+                            duplicateKeys.Add(key);
+
+                            // re-submit old value with `1` suffix
+                            duplicate.EntryKey += "1";
+                            latin.Add(duplicate.EntryKey, duplicate);
+
+                            // submit new value with appropriate suffix
+                            dictEntry.EntryKey = GetUniqueKey(latin, key);
+                        }
+
+                        // entry either was unique to begin with, or it was made unique
+                        latin.Add(dictEntry.EntryKey, dictEntry);
                     }
 
-                    // TODO: properly distinguish from prior continued entry where `lastEntry` is null
-                    // TODO: on duplicate key entries, append numerical counter.  if counter is 2,
-                    //       remove previous entry and append 1.
-
-                    lastEntry = dictEntry;
-                    var key = dictEntry.EntryKey;
-                    latin[key] = lastEntry;
+                    lastKey = dictEntry.EntryKey;
                 }
             }
 
+            foreach (var duplicate in duplicateKeys)
+            {
+                latin.Remove(duplicate);
+            }
+
             return latin;
+        }
+
+        private static string GetUniqueKey(Dictionary<string, DictionaryEntry> dict, string keyBase)
+        {
+            // starting at suffix 2 because 1 is manually applied above
+            var maxTries = 100;
+            for (int i = 2; i < maxTries; i++)
+            {
+                var newKey = keyBase + i;
+                if (!dict.ContainsKey(newKey))
+                {
+                    return newKey;
+                }
+            }
+
+            throw new InvalidOperationException($"Unable to find unique key after {maxTries} attempts");
         }
     }
 }

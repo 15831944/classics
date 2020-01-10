@@ -4,7 +4,7 @@ namespace IxMilia.Classics.ProcessFile
 {
     public abstract class DictionaryEntry
     {
-        public string EntryKey { get; }
+        public string EntryKey { get; internal set; }
         public string Entry { get; }
         public string Definition { get; internal set; }
         public string Flags { get; }
