@@ -1,9 +1,10 @@
+pushd %~dp0
+
 del Aeneid.aux
 del Aeneid.pdf
 del Aeneid.ppo
 del Aeneid.ppg
 
-pushd %~dp0
 pdflatex Aeneid.tex
 if errorlevel 1 goto error
 
