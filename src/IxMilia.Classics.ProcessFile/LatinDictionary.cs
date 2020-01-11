@@ -105,7 +105,7 @@ namespace IxMilia.Classics.ProcessFile
                 //   Y = Temp special code
                 //   Z = Sent by user, no dictionary reference
                 var match = _definitionMatcher.Match(line);
-                var entry = match.Groups[1].Value.Trim();
+                var entry = match.Groups[1].Value.Trim().Replace('j', 'i').Replace('J', 'I');
                 var pos = match.Groups[2].Value.Trim();
                 var flags = match.Groups[3].Value.Trim();
                 var definition = match.Groups[4].Value.Trim().TrimEnd(';').Replace("/", ", ");
