@@ -10,14 +10,16 @@ namespace IxMilia.Classics.ProcessFile
 {
     class FileProcessor
     {
+        private string _mode;
         private string[] _textFiles;
         private string[] _glossFiles;
         private int _commonWordCount;
         private string _rawDictionaryPath;
         private int _currentLine;
 
-        public FileProcessor(string[] textFiles, string[] glossFiles, int commonWordCount, string rawDictionaryPath)
+        public FileProcessor(string mode, string[] textFiles, string[] glossFiles, int commonWordCount, string rawDictionaryPath)
         {
+            _mode = mode;
             _textFiles = textFiles;
             _glossFiles = glossFiles;
             _commonWordCount = commonWordCount;
@@ -32,6 +34,25 @@ namespace IxMilia.Classics.ProcessFile
             var emptyGloss = new Dictionary<int, Gloss>();
             var latin = LatinDictionary.LoadDictionary(_rawDictionaryPath);
 
+            switch (_mode)
+            {
+                case "poetry":
+                    ProcessPoetry(outputPath, definedWords, undefinedKeys, emptyGloss, latin);
+                    break;
+            }
+
+            // sort common/uncommon words
+            var ordered = definedWords.OrderByDescending(d => d.Value.Item1).ToList();
+            var commonWords = ordered.Take(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
+            var uncommonWords = ordered.Skip(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
+
+            File.WriteAllText(Path.Combine(outputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(outputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
+            File.WriteAllText(Path.Combine(outputPath, "undefinedKeys.txt"), string.Join("\r\n", undefinedKeys.OrderBy(x => x)));
+        }
+
+        private void ProcessPoetry(string outputPath, Dictionary<string, (int, string, string)> definedWords, HashSet<string> undefinedKeys, Dictionary<int, Gloss> emptyGloss, Dictionary<string, DictionaryEntry> latin)
+        {
             for (int i = 0; i < _textFiles.Length; i++)
             {
                 // prepare text content
@@ -190,15 +211,6 @@ namespace IxMilia.Classics.ProcessFile
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.tex"), content.ToString());
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.html"), htmlContent.ToString());
             }
-
-            // sort common/uncommon words
-            var ordered = definedWords.OrderByDescending(d => d.Value.Item1).ToList();
-            var commonWords = ordered.Take(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
-            var uncommonWords = ordered.Skip(_commonWordCount).Select(d => new KeyValuePair<string, Tuple<string, string>>(d.Key, Tuple.Create(d.Value.Item2, d.Value.Item3)));
-
-            File.WriteAllText(Path.Combine(outputPath, "commonwords.tex"), string.Join("\r\n", commonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newcommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
-            File.WriteAllText(Path.Combine(outputPath, "uncommonwords.tex"), string.Join("\r\n", uncommonWords.OrderBy(kvp => kvp.Key).Select(kvp => $@"\newuncommonterm{{{EscapeStringToLatex(kvp.Key)}}}{{{EscapeStringToLatex(kvp.Value.Item1)}}}{{{EscapeStringToLatex(kvp.Value.Item2)}}}")));
-            File.WriteAllText(Path.Combine(outputPath, "undefinedKeys.txt"), string.Join("\r\n", undefinedKeys.OrderBy(x => x)));
         }
 
         private void AssertCurrentLineNumber(XElement element, int bookNumber)

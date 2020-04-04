@@ -6,19 +6,20 @@ namespace IxMilia.Classics.ProcessFile
     {
         static void Main(string[] args)
         {
-            if (args.Length != 5)
+            if (args.Length != 6)
             {
-                Console.WriteLine("Expected 5 arguments: <text-files> <gloss-files> <output-path> <common-word-count> <raw-dict-path>");
+                Console.WriteLine("Expected 6 arguments: <mode> <text-files> <gloss-files> <output-path> <common-word-count> <raw-dict-path>");
                 Environment.Exit(1);
             }
 
-            var textFiles = args[0].Split(',');
-            var glossFiles = args[1].Split(',');
-            var outputPath = args[2];
-            var commonWordCount = int.Parse(args[3]);
-            var rawDictionaryPath = args[4];
+            var mode = args[0];
+            var textFiles = args[1].Split(',');
+            var glossFiles = args[2].Split(',');
+            var outputPath = args[3];
+            var commonWordCount = int.Parse(args[4]);
+            var rawDictionaryPath = args[5];
 
-            var processor = new FileProcessor(textFiles, glossFiles, commonWordCount, rawDictionaryPath);
+            var processor = new FileProcessor(mode, textFiles, glossFiles, commonWordCount, rawDictionaryPath);
             processor.Process(outputPath);
         }
     }

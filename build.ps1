@@ -19,10 +19,10 @@ if (-not (Test-Path "$downloadDir\DICTPAGE.RAW")) {
 dotnet restore
 dotnet build
 
-function Build-Glossary([string[]] $textFiles, [string[]] $glossFiles, [string] $outputPath, [int] $commonWordCount) {
+function Build-Glossary([string] $mode, [string[]] $textFiles, [string[]] $glossFiles, [string] $outputPath, [int] $commonWordCount) {
     $textFilesJoined = $textFiles -Join ","
     $glossFilesJoined = $glossFiles -Join ","
-    dotnet run --no-restore --no-build --project "$PSScriptRoot\src\IxMilia.Classics.ProcessFile\IxMilia.Classics.ProcessFile.csproj" $textFilesJoined $glossFilesJoined $outputPath $commonWordCount "$outputPath\LatinDictionary.txt"
+    dotnet run --no-restore --no-build --project "$PSScriptRoot\src\IxMilia.Classics.ProcessFile\IxMilia.Classics.ProcessFile.csproj" $mode $textFilesJoined $glossFilesJoined $outputPath $commonWordCount "$outputPath\LatinDictionary.txt"
 }
 
 function Build-Aeneid() {
@@ -51,7 +51,7 @@ function Build-Aeneid() {
         $glossFiles += "$aeneidGlossDir\aeneid$i.xml"
     }
 
-    Build-Glossary -textFiles $textFiles -glossFiles $glossFiles -outputPath $outputPath -commonWordCount $commonWordCount
+    Build-Glossary -mode poetry -textFiles $textFiles -glossFiles $glossFiles -outputPath $outputPath -commonWordCount $commonWordCount
     & "$PSScriptRoot\Documents\Aeneid\make-pdf.bat"
 }
 
