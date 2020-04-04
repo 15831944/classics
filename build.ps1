@@ -58,6 +58,7 @@ function Build-Aeneid() {
 function Build-DeBelloCivili() {
     $maxBoox = 1
     $outputPath = "$PSScriptRoot\Documents\DeBelloCivili"
+    $commonWordCount = 3
 
     $deBelloGlossDir = "$glossDir\deBelloCivili"
 
