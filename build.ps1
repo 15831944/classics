@@ -55,4 +55,34 @@ function Build-Aeneid() {
     & "$PSScriptRoot\Documents\Aeneid\make-pdf.bat"
 }
 
+function Build-DeBelloCivili() {
+    $maxBoox = 1
+    $outputPath = "$PSScriptRoot\Documents\DeBelloCivili"
+
+    $deBelloGlossDir = "$glossDir\deBelloCivili"
+
+    # combine dictionaries
+    Get-Content "$downloadDir\DICTPAGE.RAW","$deBelloGlossDir\dictionary-suppliment.txt" | Set-Content "$outputPath\LatinDictionary.txt"
+
+    # download content
+    if (-not (Test-Path "$downloadDir\deBelloCivili1.xml")) {
+        $urlBase = "http://www.perseus.tufts.edu/hopper/xmlchunk?doc=Perseus%3Atext%3A1999.02.0075%3Abook%3D"
+        for ($i = 1; $i -le $maxBoox; $i++) {
+            Invoke-WebRequest -Uri "$urlBase$i" -OutFile "$downloadDir\deBelloCivili$i.xml"
+        }
+    }
+
+    # build de bello civili
+    $textFiles = @()
+    $glossFiles = @()
+    for ($i = 1; $i -le $maxBook; $i++) {
+        $textFiles += "$downloadDir\deBelloCivili$i.xml"
+        $glossFiles += "$deBelloGlossDir\deBelloCivili$i.xml"
+    }
+
+    Build-Glossary -mode prose -textFiles $textFiles -glossFiles $glossFiles -outputPath $outputPath -commonWordCount $commonWordCount
+    & "$PSScriptRoot\Documents\DeBelloCivili\make-pdf.bat"
+}
+
 Build-Aeneid
+Build-DeBelloCivili

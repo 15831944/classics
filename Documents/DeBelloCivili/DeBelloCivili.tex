@@ -1,0 +1,111 @@
+\documentclass{book}
+\title{De Bello Civili}
+\author{C. Iulius Caesar}
+\date{}
+\usepackage[nonumberlist,nogroupskip,nopostdot,toc]{glossaries}
+\usepackage{glossary-mcols}
+\usepackage[switch,modulo]{lineno}
+\usepackage{everypage}
+\usepackage[hang,flushmargin]{footmisc} % don't indent footnotes
+\usepackage{multicol}
+\usepackage{uncommonfootnote}
+\usepackage{fancyhdr}
+
+% use two-column footnotes
+\usepackage{dblfnote}
+\DFNalwaysdouble
+%\interfootnotelinepenalty=10000
+
+\newglossarystyle{mcolindex-noindent}{
+    \setglossarystyle{mcolindex}
+    \renewenvironment{theglossary}{%
+        \begin{multicols*}{\glsmcols}
+        \setlength{\parindent}{0pt}
+        \setlength{\parskip}{0pt}
+        %\normalsize
+        %\small
+        \footnotesize
+        %\scriptsize
+        %\tiny
+        \raggedright
+    }{%
+        \end{multicols*}
+    }
+    \renewcommand*{\glossentry}[2]{%
+        \textbf{\glossentryname{##1}} \glossentrydesc{##1}\par%
+        \markboth{##1}{##1}%
+    }
+}
+\setglossarystyle{mcolindex-noindent}
+
+\newcommand\currentbook{1}
+\newcommand\newbook[1]{%
+    \renewcommand\currentbook{#1}
+    \section*{Book #1}
+    %\cleardoublepage
+    %\phantomsection
+    \addcontentsline{toc}{section}{Book #1}
+}
+
+\newcounter{CurrentLine}
+\newcommand\NewLine[1]{#1\stepcounter{CurrentLine}\markboth{\theCurrentLine}{\theCurrentLine}}
+\newcommand\lline[1]{\linebreak\NewLine{#1}}
+\newcommand\pline[1]{\par\NewLine{#1}}
+
+% common words
+\input{commonwords.tex}
+
+% uncommon words
+\input{uncommonwords.tex}
+
+\begin{document}
+
+    \maketitle
+    \tableofcontents
+
+    \chapter{Introduction}
+    TODO: introduction
+
+    \cleardoublepage
+    \pagestyle{fancy}
+    \fancyhead{}
+    \fancyhead[RO,LE]{\thepage}
+    \fancyhead[CO]{BOOK \currentbook, \rightmark--\leftmark}
+    \fancyhead[CE]{DE BELLO CIVILI, \rightmark--\leftmark}
+    \fancyfoot{}
+    \renewcommand\headrulewidth{0pt}
+    \renewcommand\footrulewidth{0pt}
+    \chapter{De Bello Civili}
+
+    \begin{linenumbers}
+        \raggedright
+        \setlength{\parindent}{1em}
+        \setlength{\parskip}{0pt}
+        % TODO: unset this for the footnotes
+        %\setlength{\hoffset}{1in}
+        \input{content1.tex}
+        %\input{content2.tex}
+        %\input{content3.tex}
+        %\input{content4.tex}
+        %\input{content5.tex}
+        %\input{content6.tex}
+        %\input{content7.tex}
+        %\input{content8.tex}
+        %\input{content9.tex}
+        %\input{content10.tex}
+        %\input{content11.tex}
+        %\input{content12.tex}
+    \end{linenumbers}
+
+    \cleardoublepage
+    \pagestyle{fancy}
+    \fancyhead{}
+    \fancyhead[L]{\rightmark}
+    \fancyhead[R]{\leftmark}
+    \fancyfoot[C]{\thepage}
+    \renewcommand\chaptermark{}
+    \renewcommand\sectionmark{}
+    \printcommonglossary
+    \printuncommonglossary
+
+\end{document}

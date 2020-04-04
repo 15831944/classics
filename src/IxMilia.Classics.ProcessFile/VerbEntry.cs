@@ -28,7 +28,7 @@ namespace IxMilia.Classics.ProcessFile
             }
             else
             {
-                return null;
+                return new VerbEntry(entry, definition, Conjugation.Unknown, flags);
             }
         }
     }

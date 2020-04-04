@@ -39,6 +39,9 @@ namespace IxMilia.Classics.ProcessFile
                 case "poetry":
                     ProcessPoetry(outputPath, definedWords, undefinedKeys, emptyGloss, latin);
                     break;
+                case "prose":
+                    ProcessProse(outputPath, definedWords, undefinedKeys, emptyGloss, latin);
+                    break;
             }
 
             // sort common/uncommon words
@@ -210,6 +213,73 @@ namespace IxMilia.Classics.ProcessFile
 
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.tex"), content.ToString());
                 File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.html"), htmlContent.ToString());
+            }
+        }
+
+        private void ProcessProse(string outputPath, Dictionary<string, (int, string, string)> definedWords, HashSet<string> undefinedKeys, Dictionary<int, Gloss> emptyGloss, Dictionary<string, DictionaryEntry> latin)
+        {
+            for (int i = 0; i < _textFiles.Length; i++)
+            {
+                // prepare text content
+                var textFile = _textFiles[i];
+                var document = XDocument.Load(textFile).Root;
+                var textContent = document.Element("text").Element("body").Element("div1");
+                var bookNumber = int.Parse(textContent.Attribute("n").Value);
+                var elements = textContent.Elements();
+                var chapters = textContent.Elements("div2");
+
+                // prepare glosses
+                var glossFile = _glossFiles[i];
+                var chapterGlosses = new Dictionary<int, Dictionary<int, Gloss>>();
+                if (File.Exists(glossFile))
+                {
+                    var gloss = XDocument.Load(glossFile).Root;
+                    foreach (var c in gloss.Elements("c"))
+                    {
+                        var chapterNumber = int.Parse(c.Attribute("n").Value);
+                        var glossValues = c.Elements("g").Select(g => new Gloss(int.Parse(g.Attribute("o").Value), int.Parse(g.Attribute("l").Value), g.Attribute("k").Value)).ToDictionary(g => g.Offset, g => g);
+                        chapterGlosses.Add(chapterNumber, glossValues);
+                    }
+                }
+
+                // go
+                var content = new StringBuilder();
+                foreach (var chapter in chapters)
+                {
+                    var chapterNumber = int.Parse(chapter.Attribute("n").Value);
+                    var glosses = chapterGlosses.ContainsKey(chapterNumber)
+                        ? chapterGlosses[chapterNumber]
+                        : emptyGloss;
+                    var lineText = chapter.Value;
+                    for (int j = 0; j < lineText.Length; j++)
+                    {
+                        if (glosses.TryGetValue(j, out var gloss))
+                        {
+                            var glossed = lineText.Substring(gloss.Offset, gloss.Length);
+                            if (latin.TryGetValue(gloss.Key, out var defined))
+                            {
+                                var (count, entry, definition) = definedWords.ContainsKey(gloss.Key)
+                                    ? definedWords[gloss.Key]
+                                    : (0, defined.Entry, defined.Definition);
+                                definedWords[gloss.Key] = (count + 1, entry, definition);
+                                content.Append($@"\agls{{{EscapeStringToLatex(gloss.Key)}}}{{{EscapeStringToLatex(glossed)}}}");
+                            }
+                            else
+                            {
+                                content.Append(EscapeStringToLatex(glossed));
+                                undefinedKeys.Add(gloss.Key);
+                            }
+
+                            j = gloss.Offset + gloss.Length - 1;
+                        }
+                        else
+                        {
+                            AppendCharacterToLatex(content, lineText[j]);
+                        }
+                    }
+                }
+
+                File.WriteAllText(Path.Combine(outputPath, $"content{bookNumber}.tex"), content.ToString());
             }
         }
 

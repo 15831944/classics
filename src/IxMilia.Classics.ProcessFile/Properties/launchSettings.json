@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IxMilia.Classics.ProcessFile": {
+      "commandName": "Project",
+      "commandLineArgs": "prose E:\\ixmilia\\classics\\artifacts\\downloads\\deBelloCivili1.xml E:\\ixmilia\\classics\\gloss\\deBelloCivili\\deBelloCivili1.xml E:\\ixmilia\\classics\\Documents\\DeBelloCivili 10 E:\\ixmilia\\classics\\Documents\\DeBelloCivili\\LatinDictionary.txt"
+    }
+  }
+}
